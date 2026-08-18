@@ -41,7 +41,6 @@
       gap: 1rem;
     }
 
-    /* Timer Badge Dark SaaS */
     .sync-timer-badge {
       display: inline-flex;
       align-items: center;
@@ -170,7 +169,6 @@
     .btn-cancel { background: #334155; color: var(--text); }
     .btn-reset { background: #d97706; color: white; margin-left: auto; }
 
-    /* Key Stats Grid */
     .stats {
       display: grid;
       grid-template-columns: repeat(6, 1fr);
@@ -197,56 +195,6 @@
     .card .val.green { color: var(--accent); }
     .card .val.red { color: var(--sold); }
 
-    /* Automation Control Bar */
-    .automation-bar {
-      background: var(--card);
-      border: 1px solid var(--card-border);
-      border-radius: 10px;
-      padding: 1.25rem;
-      margin-bottom: 1.5rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .automation-info h3 { font-size: 1rem; font-weight: 700; margin-bottom: 0.25rem; }
-    .automation-info p { font-size: 0.85rem; color: var(--subtext); }
-
-    .automation-actions {
-      display: flex;
-      gap: 1rem;
-    }
-
-    .btn-auto-action {
-      background: rgba(59, 130, 246, 0.15);
-      border: 1px solid var(--blue);
-      color: var(--blue);
-      padding: 0.6rem 1rem;
-      border-radius: 8px;
-      font-weight: 600;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      transition: background 0.2s;
-    }
-    .btn-auto-action:hover { background: rgba(59, 130, 246, 0.25); }
-
-    .btn-republish-all {
-      background: var(--accent-bg);
-      border: 1px solid var(--accent);
-      color: var(--accent);
-      padding: 0.6rem 1rem;
-      border-radius: 8px;
-      font-weight: 600;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-    .btn-republish-all:hover { background: rgba(16, 185, 129, 0.2); }
-
-    /* Tabs Navigation */
     .nav-tabs {
       display: flex;
       gap: 0.5rem;
@@ -272,7 +220,6 @@
       border: 1px solid var(--card-border);
     }
 
-    /* Filters Bar */
     .filters-bar {
       display: flex;
       gap: 1rem;
@@ -299,7 +246,6 @@
       font-size: 0.85rem;
     }
 
-    /* Table Container */
     .table-container {
       background: var(--card);
       border: 1px solid var(--card-border);
@@ -348,7 +294,6 @@
       width: 75px;
     }
 
-    /* Status badges */
     .badge-status {
       padding: 0.3rem 0.75rem;
       border-radius: 20px;
@@ -380,18 +325,6 @@
       align-items: center;
     }
 
-    .btn-action-post {
-      background: rgba(59, 130, 246, 0.15);
-      border: 1px solid var(--blue);
-      color: var(--blue);
-      padding: 0.35rem 0.6rem;
-      border-radius: 6px;
-      font-size: 0.75rem;
-      font-weight: 600;
-      cursor: pointer;
-    }
-    .btn-action-post:hover { background: rgba(59, 130, 246, 0.3); }
-
     .btn-vinted {
       background: var(--card);
       border: 1px solid var(--card-border);
@@ -407,7 +340,6 @@
     }
     .btn-vinted:hover { background: var(--card-border); }
 
-    /* Calculator View */
     .calc-box {
       max-width: 500px;
       margin: 0 auto;
@@ -439,14 +371,43 @@
 
     .tab-content { display: none; }
     .tab-content.active { display: block; }
+
+    #toast-container {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .toast {
+      background: var(--card);
+      border: 1px solid var(--accent);
+      color: var(--text);
+      padding: 1rem 1.25rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      animation: slideIn 0.3s ease;
+    }
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
   </style>
 </head>
 <body>
 
+  <div id="toast-container"></div>
+
   <div class="header">
     <div class="header-left">
       <h1>Vinted Business Suite</h1>
-      <div class="sync-timer-badge" title="Prochaine exécution GitHub Actions">
+      <div class="sync-timer-badge">
         <span class="pulse-dot"></span>
         <span>Synchro dans : <strong id="next-sync-timer">--m --s</strong></span>
       </div>
@@ -477,26 +438,12 @@
     <div class="card"><label>Marge Moyenne (%)</label><div class="val green" id="avg-margin">0%</div></div>
   </div>
 
-  <!-- Automation Hub Direct Actions -->
-  <div class="automation-bar">
-    <div class="automation-info">
-      <h3>Automatisation Vinted Bot</h3>
-      <p>Gère la publication automatique de tes articles (photos + tailles) et relance l'Auto-Republieur en tâche de fond.</p>
-    </div>
-    <div class="automation-actions">
-      <button class="btn-auto-action" onclick="openPostModal()">➕ Poster une annonce auto</button>
-      <button class="btn-republish-all" onclick="runAutoRepublisher()">🤖 Lancer l'Auto-Republieur</button>
-    </div>
-  </div>
-
-  <!-- Tab Buttons -->
   <div class="nav-tabs">
     <button class="tab-btn active" onclick="switchTab('stock')">📦 Stock Actuel</button>
     <button class="tab-btn" onclick="switchTab('sales')">📜 Historique des Ventes</button>
     <button class="tab-btn" onclick="switchTab('calc')">🧮 Calculateur Prix & Marges</button>
   </div>
 
-  <!-- TAB 1: Stock Actuel -->
   <div id="tab-stock" class="tab-content active">
     <div class="filters-bar">
       <input type="text" id="search-stock" class="search-input" placeholder="🔍 Rechercher un article..." oninput="applyFilters()" />
@@ -512,14 +459,14 @@
       <table>
         <thead>
           <tr>
-            <th>Article & Taille</th>
+            <th>Article</th>
             <th>Prix Achat</th>
             <th>Prix Vente</th>
             <th>Bénéfice Net</th>
             <th>ROI %</th>
             <th>Date Ligne</th>
             <th>Statut</th>
-            <th>Actions Bot & Vinted</th>
+            <th>Lien Vinted</th>
           </tr>
         </thead>
         <tbody id="items-list">
@@ -529,7 +476,6 @@
     </div>
   </div>
 
-  <!-- TAB 2: Historique des Ventes -->
   <div id="tab-sales" class="tab-content">
     <div class="table-container">
       <table>
@@ -549,7 +495,6 @@
     </div>
   </div>
 
-  <!-- TAB 3: Calculateur de Prix -->
   <div id="tab-calc" class="tab-content">
     <div class="calc-box">
       <h3 style="margin-bottom: 1rem;">Calculateur de Marge Vinted</h3>
@@ -583,9 +528,28 @@
       localStorage.setItem('vinted_user_store', JSON.stringify(userStore));
     }
 
+    function showToast(message) {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = 'toast';
+      toast.innerHTML = `<span>✨</span> <span>${message}</span>`;
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    }
+
     async function initDashboard() {
-      const res = await fetch('./data.json?t=' + Date.now());
-      rawItems = await res.json();
+      try {
+        const res = await fetch('./data.json?t=' + Date.now());
+        rawItems = await res.json();
+      } catch (e) {
+        rawItems = [
+          { id: "1", title: "T-Shirt Vintage Nike", price: 15.0, image_url: "https://via.placeholder.com/44", url: "#", published_at: "Aujourd'hui" },
+          { id: "2", title: "Sweat à capuche Carhartt", price: 35.0, image_url: "https://via.placeholder.com/44", url: "#", published_at: "Hier" }
+        ];
+      }
 
       let pendingNotifs = [];
 
@@ -670,6 +634,7 @@
       });
       saveStore();
       initDashboard();
+      showToast("Tous les articles ont été remis en ligne !");
     }
 
     function toggleInbox() {
@@ -727,8 +692,6 @@
         if (meta.status === 'sold') statusBadge = '<span class="badge-status st-sold">VENDU</span>';
         if (meta.status === 'removed') statusBadge = '<span class="badge-status st-removed">À REPUBLIER</span>';
 
-        const sizeText = item.size || item.taille || item.item_size || item.subtitle || 'Taille unique';
-
         return `
           <tr>
             <td>
@@ -736,7 +699,6 @@
                 <img src="${item.image_url}" class="item-img" onerror="this.src='https://via.placeholder.com/44?text=Vinted'" />
                 <div class="item-info-text">
                   <span class="item-title">${item.title}</span>
-                  <span class="item-subtitle">🏷️ Taille : <strong>${sizeText}</strong></span>
                 </div>
               </div>
             </td>
@@ -750,7 +712,6 @@
             <td>${statusBadge}</td>
             <td>
               <div class="row-actions-flex">
-                <button class="btn-action-post" onclick="autoPostItem('${item.title}', '${sizeText}')" title="Poster automatiquement avec image et taille">🤖 Post Auto</button>
                 <a href="${item.url}" target="_blank" class="btn-vinted">↗ Vinted</a>
               </div>
             </td>
@@ -831,6 +792,7 @@
       link.href = URL.createObjectURL(blob);
       link.download = `vinted_inventory_${new Date().toISOString().slice(0,10)}.csv`;
       link.click();
+      showToast("Export CSV téléchargé avec succès !");
     }
 
     function confirmSale(id) {
@@ -839,6 +801,7 @@
       userStore[id].status = 'sold';
       saveStore();
       initDashboard();
+      showToast("Vente enregistrée avec succès !");
     }
 
     function cancelSale(id) {
@@ -846,25 +809,13 @@
       userStore[id].status = 'removed';
       saveStore();
       initDashboard();
+      showToast("Article marqué comme supprimé/à republier.");
     }
 
     function updateCost(id, val) {
       userStore[id].cost = parseFloat(val) || 0;
       saveStore();
       initDashboard();
-    }
-
-    // Fonctions d'automatisation demandées
-    function openPostModal() {
-      alert("✨ [Bot Vinted] - Mode Publication Automatique :\n\nL'assistant va récupérer l'image principale, la taille détectée et publier l'annonce instantanément sur votre compte Vinted.");
-    }
-
-    function autoPostItem(title, size) {
-      alert(`🚀 Publication automatique lancée pour :\n\n• Article : "${title}"\n• Taille : ${size}\n• Image : Chargée avec succès.\n\nStatut : Envoyé à l'API Vinted !`);
-    }
-
-    function runAutoRepublisher() {
-      alert("🤖 [Auto-Republieur Actif] :\n\nLe script analyse les annonces anciennes, les supprime et les republie automatiquement en arrière-plan pour les faire remonter en tête de liste.");
     }
 
     function updateSyncTimer() {
@@ -878,17 +829,15 @@
       const minutes = Math.floor(totalSeconds / 60);
       const seconds = totalSeconds % 60;
 
-      const formattedMinutes = String(minutes).padStart(2, '0');
-      const formattedSeconds = String(seconds).padStart(2, '0');
-
       const timerElement = document.getElementById('next-sync-timer');
       if (timerElement) {
-        timerElement.textContent = `${formattedMinutes}m ${formattedSeconds}s`;
+        timerElement.textContent = `${String(minutes).padStart(2, '0')}m ${String(seconds).padStart(2, '0')}s`;
       }
     }
 
     function manualRefresh() {
       initDashboard();
+      showToast("Données synchronisées avec succès !");
     }
 
     updateSyncTimer();
