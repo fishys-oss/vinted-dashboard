@@ -23,8 +23,9 @@
     body {
       background-color: var(--bg);
       color: var(--text);
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       padding: 2rem;
+      -webkit-font-smoothing: antialiased;
     }
 
     .header {
@@ -313,7 +314,7 @@
       background: #1e293b;
     }
 
-    /* Status badges inspirés de l'image */
+    /* Status badges */
     .badge-status {
       padding: 0.3rem 0.75rem;
       border-radius: 20px;
@@ -533,13 +534,13 @@
         const id = item.id;
         if (!item.is_pending) {
           if (!userStore[id]) {
-            userStore[id] = { cost: 1.00, salePrice: 0.00, vintedPrice: item.price, status: 'online' };
+            userStore[id] = { cost: 1.00, salePrice: 0.00, status: 'online' };
           } else if (userStore[id].status === 'pending') {
             userStore[id].status = 'online';
           }
         } else {
           if (!userStore[id]) {
-            userStore[id] = { cost: 1.00, salePrice: 0.00, vintedPrice: item.price, status: 'pending' };
+            userStore[id] = { cost: 1.00, salePrice: 0.00, status: 'pending' };
           } else if (userStore[id].status === 'online') {
             userStore[id].status = 'pending';
           }
@@ -590,7 +591,7 @@
             </div>
             <div class="notif-actions">
               <span>Prix Vendu (€) :</span>
-              <input type="number" id="real-price-${item.id}" value="${item.vintedPrice || 0}" step="0.5" />
+              <input type="number" id="real-price-${item.id}" value="${item.price || 0}" step="0.5" />
               <button class="btn btn-confirm" onclick="confirmSale('${item.id}')">Oui, Vendu</button>
               <button class="btn btn-cancel" onclick="cancelSale('${item.id}')">Non, Supprimé</button>
             </div>
@@ -644,27 +645,24 @@
         const meta = userStore[id] || { cost: 1.00, salePrice: 0.00, status: 'online' };
 
         const cost = parseFloat(meta.cost) || 0;
-        // On prend le prix affiché dans data.json ou le prix de vente si vendu
-        const currentPrice = meta.status === 'sold' ? (parseFloat(meta.salePrice) || 0) : (item.price || 0);
-        const profit = meta.status === 'sold' ? (currentPrice - cost) : ((item.price || 0) - cost);
-        const roi = cost > 0 ? ((profit / cost) * 100) : 0;
+        const salePrice = meta.status === 'sold' ? (parseFloat(meta.salePrice) || 0) : 0.00;
+        const profit = meta.status === 'sold' ? (salePrice - cost) : 0.00;
+        const roi = cost > 0 && meta.status === 'sold' ? ((profit / cost) * 100) : 0;
 
         totalCost += cost;
-        if (meta.status === 'sold') {
-          totalProfit += profit;
-          soldCount++;
-          totalSoldProfit += profit;
-          totalSoldCost += cost;
-        } else {
-          totalProfit += profit;
-        }
 
         if (meta.status === 'online') {
           onlineCount++;
           totalStockValue += (item.price || 0);
         }
 
-        // Gestion dynamique des badges de statut visuels
+        if (meta.status === 'sold') {
+          soldCount++;
+          totalSoldProfit += profit;
+          totalSoldCost += cost;
+          totalProfit += profit;
+        }
+
         let statusBadge = '<span class="badge-status st-online">ACTIF</span>';
         if (meta.status === 'pending') statusBadge = '<span class="badge-status st-warning">⚠️ EN ATTENTE</span>';
         if (meta.status === 'sold') statusBadge = '<span class="badge-status st-sold">VENDU</span>';
@@ -682,11 +680,11 @@
               </div>
             </td>
             <td><input type="number" value="${cost.toFixed(2)}" step="0.5" onchange="updateCost('${id}', this.value)" /></td>
-            <td><strong>${currentPrice.toFixed(2)} €</strong></td>
+            <td><strong>${salePrice.toFixed(2)} €</strong></td>
             <td style="color:${profit >= 0 ? 'var(--accent)' : 'var(--sold)'}; font-weight:bold;">
-              ${profit >= 0 ? '+' : ''}${profit.toFixed(2)} €
+              ${profit > 0 ? '+' : ''}${profit.toFixed(2)} €
             </td>
-            <td><span class="roi-badge">+${roi.toFixed(0)}%</span></td>
+            <td><span class="roi-badge">${roi > 0 ? '+' : ''}${roi.toFixed(0)}%</span></td>
             <td style="color:var(--subtext); font-size: 0.8rem;">${item.published_at || 'Aujourd\'hui'}</td>
             <td>${statusBadge}</td>
             <td><a href="${item.url}" target="_blank" class="btn-vinted">↗ Vinted</a></td>
