@@ -8,7 +8,7 @@ on:
 jobs:
   scrape:
     runs-on: ubuntu-latest
-    timeout-minutes: 2
+    timeout-minutes: 4
 
     steps:
       - name: Checkout repo
@@ -20,7 +20,9 @@ jobs:
           python-version: '3.10'
 
       - name: Install dependencies
-        run: pip install requests
+        run: |
+          pip install playwright beautifulsoup4
+          playwright install chromium
 
       - name: Run scraper
         run: python scraper.py
