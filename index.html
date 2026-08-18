@@ -674,9 +674,9 @@
 
         const cost = parseFloat(meta.cost) || 0;
         
-        // Calcul du prix de vente et du bénéfice en direct selon le statut (en ligne = prix Vinted, vendu = prix de vente réel)
-        const currentSalePrice = meta.status === 'sold' ? (parseFloat(meta.salePrice) || 0) : (parseFloat(item.price) || 0);
-        const profit = currentSalePrice - cost;
+        // Le prix de vente s'affiche à 0.00 € sauf s'il est vendu (choisi via la notification)
+        const currentSalePrice = meta.status === 'sold' ? (parseFloat(meta.salePrice) || 0) : 0.00;
+        const profit = meta.status === 'sold' ? (currentSalePrice - cost) : -cost;
         const roi = cost > 0 ? ((profit / cost) * 100) : 0;
 
         totalCost += cost;
@@ -684,7 +684,7 @@
         if (meta.status === 'online') {
           onlineCount++;
           totalStockValue += (item.price || 0);
-          totalProfit += profit;
+          totalProfit += profit; // -cost tant que non vendu
         }
 
         if (meta.status === 'sold') {
