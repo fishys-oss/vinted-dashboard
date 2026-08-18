@@ -283,7 +283,6 @@
     }
 
     .item-title { font-weight: 600; color: var(--text); }
-    .item-subtitle { font-size: 0.75rem; color: var(--subtext); }
 
     input[type="number"] {
       background: #0f172a;
@@ -317,6 +316,11 @@
       font-size: 0.75rem;
       font-weight: 600;
       display: inline-block;
+    }
+    .roi-badge.red {
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.25);
+      color: var(--sold);
     }
 
     .row-actions-flex {
@@ -669,15 +673,18 @@
         const meta = userStore[id] || { cost: 1.00, salePrice: 0.00, status: 'online' };
 
         const cost = parseFloat(meta.cost) || 0;
-        const salePrice = meta.status === 'sold' ? (parseFloat(meta.salePrice) || 0) : 0.00;
-        const profit = meta.status === 'sold' ? (salePrice - cost) : 0.00;
-        const roi = cost > 0 && meta.status === 'sold' ? ((profit / cost) * 100) : 0;
+        
+        // Calcul du prix de vente et du bénéfice en direct selon le statut (en ligne = prix Vinted, vendu = prix de vente réel)
+        const currentSalePrice = meta.status === 'sold' ? (parseFloat(meta.salePrice) || 0) : (parseFloat(item.price) || 0);
+        const profit = currentSalePrice - cost;
+        const roi = cost > 0 ? ((profit / cost) * 100) : 0;
 
         totalCost += cost;
 
         if (meta.status === 'online') {
           onlineCount++;
           totalStockValue += (item.price || 0);
+          totalProfit += profit;
         }
 
         if (meta.status === 'sold') {
@@ -703,11 +710,11 @@
               </div>
             </td>
             <td><input type="number" value="${cost.toFixed(2)}" step="0.5" onchange="updateCost('${id}', this.value)" /></td>
-            <td><strong>${salePrice.toFixed(2)} €</strong></td>
-            <td style="color:${profit >= 0 ? 'var(--accent)' : 'var(--sold)'}; font-weight:bold;">
+            <td><strong>${currentSalePrice.toFixed(2)} €</strong></td>
+            <td style="color:${profit < 0 ? 'var(--sold)' : 'var(--accent)'}; font-weight:bold;">
               ${profit > 0 ? '+' : ''}${profit.toFixed(2)} €
             </td>
-            <td><span class="roi-badge">${roi > 0 ? '+' : ''}${roi.toFixed(0)}%</span></td>
+            <td><span class="roi-badge ${roi < 0 ? 'red' : ''}">${roi > 0 ? '+' : ''}${roi.toFixed(0)}%</span></td>
             <td style="color:var(--subtext); font-size: 0.8rem;">${item.published_at || 'Aujourd\'hui'}</td>
             <td>${statusBadge}</td>
             <td>
@@ -721,7 +728,7 @@
 
       const profitElem = document.getElementById('total-profit');
       profitElem.innerText = (totalProfit >= 0 ? "+" : "") + totalProfit.toFixed(2) + " €";
-      profitElem.className = "val " + (totalProfit >= 0 ? "green" : "red");
+      profitElem.className = "val " + (totalProfit < 0 ? "red" : "green");
 
       document.getElementById('total-items').innerText = onlineCount;
       document.getElementById('total-value').innerText = totalStockValue.toFixed(2) + " €";
@@ -760,7 +767,7 @@
             </td>
             <td>${cost.toFixed(2)} €</td>
             <td>${sale.toFixed(2)} €</td>
-            <td style="color:${profit >= 0 ? 'var(--accent)' : 'var(--sold)'}; font-weight:bold;">
+            <td style="color:${profit < 0 ? 'var(--sold)' : 'var(--accent)'}; font-weight:bold;">
               ${profit >= 0 ? '+' : ''}${profit.toFixed(2)} €
             </td>
             <td>${margin.toFixed(0)} %</td>
@@ -815,7 +822,7 @@
     function updateCost(id, val) {
       userStore[id].cost = parseFloat(val) || 0;
       saveStore();
-      initDashboard();
+      applyFilters();
     }
 
     function updateSyncTimer() {
