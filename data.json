@@ -10,16 +10,6 @@
     "is_pending": false
   },
   {
-    "id": "9688815472",
-    "title": "BZB",
-    "price": 3.0,
-    "url": "https://www.vinted.fr/items/9688815472",
-    "image_url": "https://images1.vinted.net/t/05_00678_wyzykhMNwzJAiTjvob9qcqxC/310x430/1786973339.webp?s=65c85ebe1a4334081d5dcff014dc5e5ecc10db72",
-    "published_at": "18/08/2026",
-    "is_sold": false,
-    "is_pending": false
-  },
-  {
     "id": "9688789337",
     "title": "kreemo",
     "price": 6.0,
@@ -48,5 +38,15 @@
     "published_at": "18/08/2026",
     "is_sold": false,
     "is_pending": false
+  },
+  {
+    "id": "9688815472",
+    "title": "BZB",
+    "price": 3.0,
+    "url": "https://www.vinted.fr/items/9688815472",
+    "image_url": "https://images1.vinted.net/t/05_00678_wyzykhMNwzJAiTjvob9qcqxC/310x430/1786973339.webp?s=65c85ebe1a4334081d5dcff014dc5e5ecc10db72",
+    "published_at": "18/08/2026",
+    "is_sold": false,
+    "is_pending": true
   }
 ]
