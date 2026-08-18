@@ -199,6 +199,48 @@
     .card .val.green { color: var(--accent); }
     .card .val.red { color: var(--sold); }
 
+    /* Features Section (Diapo Cards) */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .feature-card {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .feature-icon {
+      width: 36px;
+      height: 36px;
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+    }
+
+    .feature-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .feature-desc {
+      font-size: 0.85rem;
+      color: var(--subtext);
+      line-height: 1.4;
+    }
+
     /* Tabs Navigation */
     .nav-tabs {
       display: flex;
@@ -428,6 +470,25 @@
     <div class="card"><label>Bénéfice Net Global</label><div class="val" id="total-profit">0.00 €</div></div>
     <div class="card"><label>Bénéfice Moyen / Vente</label><div class="val green" id="avg-profit">0.00 €</div></div>
     <div class="card"><label>Marge Moyenne (%)</label><div class="val green" id="avg-margin">0%</div></div>
+  </div>
+
+  <!-- Section Fonctionnalités Clés (Diaporama) -->
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon">✨</div>
+      <div class="feature-title">Générateur d'Annonces IA</div>
+      <div class="feature-desc">Rédigez des descriptions captivantes avec mots-clés optimisés à partir d'une simple photo d'article.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📄</div>
+      <div class="feature-title">Export Fiscal DAC7</div>
+      <div class="feature-desc">Exportez en un clic un bilan complet des ventes et bénéfices conforme pour la déclaration fiscale.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🤖</div>
+      <div class="feature-title">Auto-Republieur</div>
+      <div class="feature-desc">Automatiserez la re-publication un-clic des articles obsolètes pour remonter en tête du fil Vinted.</div>
+    </div>
   </div>
 
   <!-- Tab Buttons -->
