@@ -14,6 +14,7 @@
       --text: #f8fafc;
       --subtext: #64748b;
       --sold: #ef4444;
+      --warning: #f59e0b;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -22,53 +23,63 @@
       background-color: var(--bg);
       color: var(--text);
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      padding: 2.5rem;
+      padding: 2rem;
     }
 
     .header {
       display: flex;
       justify-content: space-between;
-      align-items: flex-start;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+
+    /* Boîte de notifications */
+    .notif-box {
+      background: rgba(245, 158, 11, 0.1);
+      border: 1px solid var(--warning);
+      border-radius: 10px;
+      padding: 1rem 1.5rem;
       margin-bottom: 2rem;
+      display: none;
     }
 
-    .header-title h1 {
-      font-size: 1.5rem;
+    .notif-title {
+      color: var(--warning);
       font-weight: 700;
+      margin-bottom: 0.75rem;
       display: flex;
       align-items: center;
-      gap: 0.75rem;
+      gap: 0.5rem;
     }
 
-    .header-title h1::before {
-      content: "V";
-      background: #8b5cf6;
-      color: white;
-      width: 32px;
-      height: 32px;
+    .notif-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--card);
+      padding: 0.75rem 1rem;
       border-radius: 8px;
+      margin-top: 0.5rem;
+      border: 1px solid var(--card-border);
+    }
+
+    .notif-actions {
       display: flex;
+      gap: 0.5rem;
       align-items: center;
-      justify-content: center;
-      font-size: 1rem;
     }
 
-    .header-title p {
-      color: var(--subtext);
-      font-size: 0.875rem;
-      margin-top: 0.25rem;
-      margin-left: 2.75rem;
-    }
-
-    .badge {
-      background: var(--accent-bg);
-      color: var(--accent);
+    .btn {
       padding: 0.4rem 0.8rem;
-      border-radius: 9999px;
-      font-size: 0.75rem;
+      border-radius: 6px;
       font-weight: 600;
-      border: 1px solid rgba(16, 185, 129, 0.2);
+      font-size: 0.8rem;
+      border: none;
+      cursor: pointer;
     }
+
+    .btn-confirm { background: var(--accent); color: white; }
+    .btn-cancel { background: #334155; color: var(--text); }
 
     .stats {
       display: grid;
@@ -81,7 +92,7 @@
       background: var(--card);
       border: 1px solid var(--card-border);
       border-radius: 10px;
-      padding: 1.25rem 1.5rem;
+      padding: 1.25rem;
     }
 
     .card label {
@@ -92,11 +103,7 @@
       margin-bottom: 0.5rem;
     }
 
-    .card .val {
-      font-size: 1.5rem;
-      font-weight: 700;
-    }
-
+    .card .val { font-size: 1.5rem; font-weight: 700; }
     .card .val.green { color: var(--accent); }
 
     .table-container {
@@ -106,242 +113,209 @@
       overflow-x: auto;
     }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      text-align: left;
-    }
-
+    table { width: 100%; border-collapse: collapse; text-align: left; }
     th {
       color: var(--subtext);
       font-size: 0.7rem;
       font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.05em;
-      padding: 1rem 1.25rem;
+      padding: 1rem;
       border-bottom: 1px solid var(--card-border);
     }
-
-    td {
-      padding: 0.85rem 1.25rem;
-      font-size: 0.875rem;
-      border-bottom: 1px solid var(--card-border);
-    }
-
-    tr:last-child td { border-bottom: none; }
-
-    td a {
-      color: #94a3b8;
-      text-decoration: none;
-      font-size: 0.8rem;
-    }
-
-    td a:hover { color: var(--text); }
+    td { padding: 0.85rem 1rem; font-size: 0.875rem; border-bottom: 1px solid var(--card-border); }
 
     input[type="number"] {
       background: #0f172a;
       border: 1px solid var(--card-border);
       color: var(--text);
-      padding: 0.4rem 0.6rem;
+      padding: 0.3rem 0.5rem;
       border-radius: 6px;
-      width: 80px;
-      font-size: 0.85rem;
+      width: 75px;
     }
 
-    input[type="number"]:focus {
-      outline: 1px solid var(--accent);
-    }
-
-    .btn-status {
-      padding: 0.3rem 0.6rem;
-      border-radius: 6px;
+    .badge-status {
+      padding: 0.25rem 0.6rem;
+      border-radius: 9999px;
       font-size: 0.75rem;
       font-weight: 600;
-      cursor: pointer;
-      border: none;
+      display: inline-block;
     }
 
-    .btn-online { background: rgba(16, 185, 129, 0.15); color: var(--accent); }
-    .btn-sold { background: rgba(239, 68, 68, 0.15); color: var(--sold); }
-
-    .tag-etat {
-      background: #1e293b;
-      padding: 0.2rem 0.5rem;
-      border-radius: 4px;
-      font-size: 0.75rem;
-      color: var(--subtext);
-    }
+    .st-online { background: rgba(16, 185, 129, 0.15); color: var(--accent); }
+    .st-pending { background: rgba(245, 158, 11, 0.15); color: var(--warning); }
+    .st-sold { background: rgba(239, 68, 68, 0.15); color: var(--sold); }
+    .st-removed { background: rgba(148, 163, 184, 0.15); color: var(--subtext); }
   </style>
 </head>
 <body>
 
   <div class="header">
-    <div class="header-title">
-      <h1>Vinted Business Suite</h1>
-      <p>Analyse automatique et gestion des bénéfices</p>
-    </div>
-    <div class="badge">● Sync Cloud Active</div>
+    <h1>Vinted Business Suite</h1>
+  </div>
+
+  <!-- Zone de Notification Ventes Détectées -->
+  <div id="notif-box" class="notif-box">
+    <div class="notif-title">⚠️ Article(s) retiré(s) de Vinted détecté(s)</div>
+    <div id="notif-list"></div>
   </div>
 
   <div class="stats">
-    <div class="card">
-      <label>Stock en Ligne</label>
-      <div class="val" id="total-items">0</div>
-    </div>
-    <div class="card">
-      <label>Valeur du Stock</label>
-      <div class="val" id="total-value">0.00 €</div>
-    </div>
-    <div class="card">
-      <label>Investissement Total</label>
-      <div class="val" id="total-cost">0.00 €</div>
-    </div>
-    <div class="card">
-      <label>Bénéfice Réalisé / Potentiel</label>
-      <div class="val green" id="total-profit">+0.00 €</div>
-    </div>
+    <div class="card"><label>Stock en Ligne</label><div class="val" id="total-items">0</div></div>
+    <div class="card"><label>Valeur Stock</label><div class="val" id="total-value">0.00 €</div></div>
+    <div class="card"><label>Total Investi</label><div class="val" id="total-cost">0.00 €</div></div>
+    <div class="card"><label>Bénéfice Réalisé</label><div class="val green" id="total-profit">+0.00 €</div></div>
   </div>
 
   <div class="table-container">
     <table>
       <thead>
         <tr>
-          <th>ARTICLE</th>
-          <th>DATE PUB.</th>
-          <th>ÉTAT</th>
-          <th>PRIX ACHAT (€)</th>
-          <th>PRIX VENTE (€)</th>
-          <th>BÉNÉFICE</th>
-          <th>STATUT</th>
-          <th>LIEN</th>
+          <th>Article</th>
+          <th>Date Pub.</th>
+          <th>Achat (€)</th>
+          <th>Vente (€)</th>
+          <th>Bénéfice</th>
+          <th>État / Statut</th>
+          <th>Lien</th>
         </tr>
       </thead>
       <tbody id="items-list">
-        <tr>
-          <td colspan="8" style="text-align:center; color: var(--subtext);">Chargement...</td>
-        </tr>
+        <tr><td colspan="7" style="text-align:center;">Chargement...</td></tr>
       </tbody>
     </table>
   </div>
 
   <script>
-    let localData = JSON.parse(localStorage.getItem('vinted_user_data') || '{}');
+    let userStore = JSON.parse(localStorage.getItem('vinted_user_store') || '{}');
 
-    function saveData() {
-      localStorage.setItem('vinted_user_data', JSON.stringify(localData));
+    function saveStore() {
+      localStorage.setItem('vinted_user_store', JSON.stringify(userStore));
     }
 
-    async function loadDashboard() {
-      try {
-        const res = await fetch('./data.json?t=' + Date.now());
-        if (!res.ok) throw new Error("Erreur de lecture");
+    async function initDashboard() {
+      const res = await fetch('./data.json?t=' + Date.now());
+      const items = await res.json();
 
-        const items = await res.json();
-        if (!Array.isArray(items) || items.length === 0) {
-          document.getElementById("items-list").innerHTML = '<tr><td colspan="8" style="text-align:center; color: var(--subtext);">Aucun article trouvé.</td></tr>';
-          return;
+      let pendingNotifs = [];
+
+      items.forEach(item => {
+        const id = item.id;
+        if (!userStore[id]) {
+          userStore[id] = {
+            cost: 1.00, // Prix d'achat par défaut fixé à 1€
+            salePrice: item.price,
+            status: item.is_pending ? 'pending' : 'online'
+          };
+        } else if (item.is_pending && userStore[id].status === 'online') {
+          userStore[id].status = 'pending';
         }
 
-        renderTable(items);
+        if (userStore[id].status === 'pending') {
+          pendingNotifs.push({ ...item, ...userStore[id] });
+        }
+      });
 
-      } catch (err) {
-        console.error(err);
-        document.getElementById("items-list").innerHTML = '<tr><td colspan="8" style="text-align:center; color: #ef4444;">Erreur d\'accès aux données.</td></tr>';
-      }
+      saveStore();
+      renderNotifications(pendingNotifs);
+      renderDashboard(items);
     }
 
-    function renderTable(items) {
-      let onlineCount = 0;
-      let totalStockValue = 0;
-      let totalCost = 0;
-      let totalProfit = 0;
+    function renderNotifications(notifs) {
+      const box = document.getElementById('notif-box');
+      const list = document.getElementById('notif-list');
 
-      const tbody = document.getElementById("items-list");
+      if (notifs.length === 0) {
+        box.style.display = 'none';
+        return;
+      }
+
+      box.style.display = 'block';
+      list.innerHTML = notifs.map(item => `
+        <div class="notif-item">
+          <span><strong>${item.title}</strong> n'est plus en ligne. A-t-il été vendu ?</span>
+          <div class="notif-actions">
+            <span>Prix Vente :</span>
+            <input type="number" id="real-price-${item.id}" value="${item.salePrice}" step="0.5" />
+            <button class="btn btn-confirm" onclick="confirmSale('${item.id}')">Oui, Vendu</button>
+            <button class="btn btn-cancel" onclick="cancelSale('${item.id}')">Non, Supprimé</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderDashboard(items) {
+      let onlineCount = 0, totalStockValue = 0, totalCost = 0, totalRealizedProfit = 0;
+
+      const tbody = document.getElementById('items-list');
       tbody.innerHTML = items.map(item => {
         const id = item.id;
+        const meta = userStore[id] || { cost: 1.00, salePrice: item.price, status: 'online' };
 
-        // Récupération des données utilisateur locales ou valeurs par défaut
-        if (!localData[id]) {
-          localData[id] = {
-            cost: 0,
-            salePrice: item.price || 0,
-            isSold: false
-          };
-        }
+        const cost = parseFloat(meta.cost) || 0;
+        const salePrice = parseFloat(meta.salePrice) || 0;
+        const profit = salePrice - cost;
 
-        const userItem = localData[id];
-        const currentCost = parseFloat(userItem.cost) || 0;
-        const currentSalePrice = parseFloat(userItem.salePrice);
-        const isSold = userItem.isSold;
-
-        const profit = currentSalePrice - currentCost;
-
-        if (isSold) {
-          totalProfit += profit;
-        } else {
+        if (meta.status === 'online') {
           onlineCount++;
-          totalStockValue += currentSalePrice;
-          totalCost += currentCost;
-          totalProfit += profit;
+          totalStockValue += salePrice;
+          totalCost += cost;
+        } else if (meta.status === 'sold') {
+          totalRealizedProfit += profit;
         }
 
-        const pubDate = item.scraped_at ? new Date(item.scraped_at).toLocaleDateString('fr-FR') : '—';
-        const etat = item.status || 'Très bon état';
+        let statusBadge = '<span class="badge-status st-online">En ligne</span>';
+        if (meta.status === 'pending') statusBadge = '<span class="badge-status st-pending">En attente</span>';
+        if (meta.status === 'sold') statusBadge = '<span class="badge-status st-sold">Vendu</span>';
+        if (meta.status === 'removed') statusBadge = '<span class="badge-status st-removed">Retiré</span>';
 
         return `
           <tr>
-            <td><strong>${item.title || 'Article'}</strong></td>
-            <td style="color: var(--subtext); font-size: 0.8rem;">${pubDate}</td>
-            <td><span class="tag-etat">${etat}</span></td>
-            <td>
-              <input type="number" step="0.5" value="${currentCost}" onchange="updateCost('${id}', this.value)" />
-            </td>
-            <td>
-              <input type="number" step="0.5" value="${currentSalePrice}" onchange="updateSalePrice('${id}', this.value)" />
-            </td>
-            <td style="color: ${profit >= 0 ? 'var(--accent)' : 'var(--sold)'}; font-weight: 600;">
+            <td><strong>${item.title}</strong></td>
+            <td style="color:var(--subtext);">${item.published_at || '—'}</td>
+            <td><input type="number" value="${cost}" step="0.5" onchange="updateCost('${id}', this.value)" /></td>
+            <td><input type="number" value="${salePrice}" step="0.5" onchange="updateSalePrice('${id}', this.value)" /></td>
+            <td style="color:${profit >= 0 ? 'var(--accent)' : 'var(--sold)'}; font-weight:bold;">
               ${profit >= 0 ? '+' : ''}${profit.toFixed(2)} €
             </td>
-            <td>
-              <button class="btn-status ${isSold ? 'btn-sold' : 'btn-online'}" onclick="toggleStatus('${id}')">
-                ${isSold ? 'Vendu' : 'En ligne'}
-              </button>
-            </td>
-            <td><a href="${item.url}" target="_blank">Voir ↗</a></td>
+            <td>${statusBadge}</td>
+            <td><a href="${item.url}" target="_blank" style="color:var(--subtext);">Lien ↗</a></td>
           </tr>
         `;
-      }).join("");
+      }).join('');
 
-      document.getElementById("total-items").innerText = onlineCount;
-      document.getElementById("total-value").innerText = totalStockValue.toFixed(2) + " €";
-      document.getElementById("total-cost").innerText = totalCost.toFixed(2) + " €";
-      document.getElementById("total-profit").innerText = (totalProfit >= 0 ? "+" : "") + totalProfit.toFixed(2) + " €";
+      document.getElementById('total-items').innerText = onlineCount;
+      document.getElementById('total-value').innerText = totalStockValue.toFixed(2) + " €";
+      document.getElementById('total-cost').innerText = totalCost.toFixed(2) + " €";
+      document.getElementById('total-profit').innerText = (totalRealizedProfit >= 0 ? "+" : "") + totalRealizedProfit.toFixed(2) + " €";
+    }
 
-      saveData();
+    function confirmSale(id) {
+      const inputVal = document.getElementById(`real-price-${id}`).value;
+      userStore[id].salePrice = parseFloat(inputVal) || 0;
+      userStore[id].status = 'sold';
+      saveStore();
+      initDashboard();
+    }
+
+    function cancelSale(id) {
+      userStore[id].status = 'removed';
+      saveStore();
+      initDashboard();
     }
 
     function updateCost(id, val) {
-      if (!localData[id]) localData[id] = {};
-      localData[id].cost = parseFloat(val) || 0;
-      saveData();
-      loadDashboard();
+      userStore[id].cost = parseFloat(val) || 0;
+      saveStore();
+      initDashboard();
     }
 
     function updateSalePrice(id, val) {
-      if (!localData[id]) localData[id] = {};
-      localData[id].salePrice = parseFloat(val) || 0;
-      saveData();
-      loadDashboard();
+      userStore[id].salePrice = parseFloat(val) || 0;
+      saveStore();
+      initDashboard();
     }
 
-    function toggleStatus(id) {
-      if (!localData[id]) localData[id] = {};
-      localData[id].isSold = !localData[id].isSold;
-      saveData();
-      loadDashboard();
-    }
-
-    loadDashboard();
+    initDashboard();
   </script>
 </body>
 </html>
