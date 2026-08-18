@@ -53,6 +53,7 @@ def get_vinted_items():
             " .web_ui__ItemBox__price"
         )
         link_elem = card.select_one("a[href*='/items/']")
+        img_elem = card.select_one("img")
 
         if price_elem:
           price_text = (
@@ -76,13 +77,20 @@ def get_vinted_items():
                 href if href.startswith("http") else f"https://www.vinted.fr{href}"
             )
 
+          # Récupération de l'image miniature
+          img_url = ""
+          if img_elem:
+            img_url = (
+                img_elem.get("src")
+                or img_elem.get("data-src")
+                or img_elem.get("srcset", "").split(" ")[0]
+            )
+
           item_id = (
               url.split("/items/")[1].split("-")[0]
               if "/items/" in url
               else str(hash(title + str(price)))
           )
-
-          # Date d'origine conservée si déjà présent, sinon date du jour
           published_at = previous_items.get(item_id, {}).get(
               "published_at", datetime.now().strftime("%Y-%m-%d")
           )
@@ -92,6 +100,7 @@ def get_vinted_items():
               "title": title,
               "price": price,
               "url": url,
+              "image_url": img_url,
               "published_at": published_at,
               "is_sold": False,
               "is_pending": False,
@@ -104,14 +113,11 @@ def get_vinted_items():
 
   final_items = []
 
-  # Articles toujours en ligne
   for item_id, item in current_items.items():
     final_items.append(item)
 
-  # Détection des ventes/retraits
   for item_id, prev_item in previous_items.items():
     if item_id not in current_items:
-      # Si l'article n'était pas déjà marqué vendu/retiré, il passe en attente
       if not prev_item.get("is_sold", False) and not prev_item.get(
           "is_removed", False
       ):
