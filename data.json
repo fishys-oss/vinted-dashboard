@@ -4,39 +4,49 @@
     "title": "Umbro",
     "price": 7.0,
     "url": "https://www.vinted.fr/items/9688872296",
-    "scraped_at": "2026-08-18T15:36:29.676457",
-    "is_pending": true
+    "image_url": "https://images1.vinted.net/t/05_00598_xDKmCPzbRuYmCLvre1BgZSv3/310x430/1786973623.webp?s=eaa29ae7c8827df3776fc75e34c6bc66d53e52bc",
+    "published_at": "18/08/2026",
+    "is_sold": false,
+    "is_pending": false
   },
   {
     "id": "9688815472",
     "title": "BZB",
     "price": 3.0,
     "url": "https://www.vinted.fr/items/9688815472",
-    "scraped_at": "2026-08-18T15:36:29.677511",
-    "is_pending": true
+    "image_url": "https://images1.vinted.net/t/05_00678_wyzykhMNwzJAiTjvob9qcqxC/310x430/1786973339.webp?s=65c85ebe1a4334081d5dcff014dc5e5ecc10db72",
+    "published_at": "18/08/2026",
+    "is_sold": false,
+    "is_pending": false
   },
   {
     "id": "9688789337",
     "title": "kreemo",
     "price": 6.0,
     "url": "https://www.vinted.fr/items/9688789337",
-    "scraped_at": "2026-08-18T15:36:29.678560",
-    "is_pending": true
+    "image_url": "https://images1.vinted.net/t/06_01acd_cJvtpht9E87VjRAgbLweDWcg/310x430/1786973209.webp?s=b9cfae51c17d8ac16646d4c399a75024085580d0",
+    "published_at": "18/08/2026",
+    "is_sold": false,
+    "is_pending": false
   },
   {
     "id": "9688743921",
     "title": "Nike",
     "price": 8.0,
     "url": "https://www.vinted.fr/items/9688743921",
-    "scraped_at": "2026-08-18T15:36:29.679588",
-    "is_pending": true
+    "image_url": "https://images1.vinted.net/t/05_020c3_MGjMq7FfiWev8QXtqAjjKXck/310x430/1786972981.webp?s=dcd3959050c6aa85f65f0e3184aaba223d7ee042",
+    "published_at": "18/08/2026",
+    "is_sold": false,
+    "is_pending": false
   },
   {
     "id": "9688687963",
     "title": "Nike",
     "price": 5.0,
     "url": "https://www.vinted.fr/items/9688687963",
-    "scraped_at": "2026-08-18T15:36:29.680600",
-    "is_pending": true
+    "image_url": "https://images1.vinted.net/t/04_0137b_knvDyA3GfxZDDxSHeNgMfit6/310x430/1786972696.webp?s=bcd8651aa936c6b3db0723f1ea52882745dc71f2",
+    "published_at": "18/08/2026",
+    "is_sold": false,
+    "is_pending": false
   }
 ]
