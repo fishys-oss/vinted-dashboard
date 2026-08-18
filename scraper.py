@@ -4,7 +4,6 @@ import requests
 
 USER_ID = "249331091"
 
-# Headers reproduisant un vrai navigateur
 headers = {
     "User-Agent": (
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML,"
@@ -21,15 +20,21 @@ def get_vinted_items():
   session.headers.update(headers)
 
   try:
-    # Step 1 : Initialisation des cookies de session
-    print("Initialisation de la session Vinted...")
-    init_res = session.get("https://www.vinted.fr", timeout=15)
+    # 1. Visite du profil pour récupérer les cookies de session Vinted
+    print(f"Initialisation de la session pour l'utilisateur {USER_ID}...")
+    session.get(f"https://www.vinted.fr/member/{USER_ID}", timeout=15)
 
-    # Step 2 : Récupération des articles via la route API des membres
-    api_url = f"https://www.vinted.fr/api/v2/users/{USER_ID}/items?page=1&per_page=20"
-    print(f"Interrogation de l'API : {api_url}")
+    # 2. Test de la route API Wardrobe (Dressing)
+    api_url = f"https://www.vinted.fr/api/v2/users/{USER_ID}/wardrobe?page=1&per_page=20"
+    print(f"Extraction des articles via : {api_url}")
 
     res = session.get(api_url, timeout=15)
+
+    # 3. Fallback sur le catalogue si la route wardrobe échoue
+    if res.status_code == 404:
+      print("Route /wardrobe introuvable, essai via /catalog/items...")
+      api_url = f"https://www.vinted.fr/api/v2/catalog/items?user_id={USER_ID}&per_page=20"
+      res = session.get(api_url, timeout=15)
 
     if res.status_code == 200:
       data = res.json()
@@ -37,7 +42,7 @@ def get_vinted_items():
 
       formatted_items = []
       for item in items_data:
-        # Traitement du prix (structure objet ou valeur simple)
+        # Traitement du prix (objet ou valeur brute)
         price_val = item.get("price")
         if isinstance(price_val, dict):
           price = float(price_val.get("amount", 0))
@@ -46,15 +51,18 @@ def get_vinted_items():
         else:
           price = 0.0
 
+        item_id = str(item.get("id"))
+        title = item.get("title") or "Article Vinted"
+        url = item.get("url") or f"https://www.vinted.fr/items/{item_id}"
+
         formatted_items.append({
-            "id": str(item.get("id")),
-            "title": item.get("title", "Article Vinted"),
+            "id": item_id,
+            "title": title,
             "price": price,
-            "url": item.get("url", ""),
+            "url": url,
             "scraped_at": datetime.now().isoformat(),
         })
 
-      # Écriture dans le fichier JSON
       with open("data.json", "w", encoding="utf-8") as f:
         json.dump(formatted_items, f, indent=2, ensure_ascii=False)
 
@@ -62,12 +70,9 @@ def get_vinted_items():
 
     else:
       print(f"❌ Erreur API Vinted (Statut {res.status_code})")
-      # Si échec, écriture d'un fichier vide pour éviter de casser le pipeline
-      with open("data.json", "w", encoding="utf-8") as f:
-        json.dump([], f)
 
   except Exception as e:
-    print(f"❌ Erreur d'exécution : {e}")
+    print(f"❌ Erreur : {e}")
 
 
 if __name__ == "__main__":
