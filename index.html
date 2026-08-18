@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vinted Analytics SaaS</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #090a0f;
+      --card-bg: #12141c;
+      --border: #1f2430;
+      --text: #f3f4f6;
+      --text-muted: #8b949e;
+      --accent: #6366f1;
+      --green: #10b981;
+      --red: #ef4444;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      padding: 40px 20px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .container { width: 100%; max-width: 1100px; }
+
+    /* Header */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 32px;
+    }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .logo-icon {
+      width: 40px; height: 40px;
+      background: linear-gradient(135deg, #6366f1, #a855f7);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; color: #fff;
+    }
+    h1 { font-size: 20px; font-weight: 700; letter-spacing: -0.3px; }
+    .subtitle { color: var(--text-muted); font-size: 13px; margin-top: 2px; }
+
+    .status-badge {
+      display: flex; align-items: center; gap: 8px;
+      background: rgba(16, 185, 129, 0.08);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+      color: var(--green);
+      padding: 6px 14px; border-radius: 20px;
+      font-size: 12px; font-weight: 600;
+    }
+    .pulse {
+      width: 8px; height: 8px; background-color: var(--green);
+      border-radius: 50%; box-shadow: 0 0 8px var(--green);
+    }
+
+    /* Cards KPI */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px; margin-bottom: 32px;
+    }
+    .kpi-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px; padding: 20px;
+    }
+    .kpi-label { color: var(--text-muted); font-size: 12px; font-weight: 500; }
+    .kpi-value { font-size: 24px; font-weight: 700; margin-top: 8px; }
+
+    /* Table */
+    .table-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 14px; overflow: hidden;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    }
+    table { width: 100%; border-collapse: collapse; text-align: left; }
+    th {
+      background: #171a24; color: var(--text-muted);
+      padding: 16px 20px; font-size: 11px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.5px;
+      border-bottom: 1px solid var(--border);
+    }
+    td { padding: 18px 20px; border-bottom: 1px solid var(--border); font-size: 14px; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover { background: rgba(255, 255, 255, 0.02); }
+
+    .item-title { font-weight: 600; color: #fff; }
+    .profit-tag { color: var(--green); font-weight: 600; }
+    
+    .btn-action {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(99, 102, 241, 0.1);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      color: #818cf8; padding: 6px 12px; border-radius: 6px;
+      text-decoration: none; font-size: 12px; font-weight: 500;
+      transition: all 0.2s;
+    }
+    .btn-action:hover { background: rgba(99, 102, 241, 0.2); }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="header">
+      <div class="brand">
+        <div class="logo-icon">V</div>
+        <div>
+          <h1>Vinted Business Suite</h1>
+          <p class="subtitle">Analyse automatique du catalogue</p>
+        </div>
+      </div>
+      <div class="status-badge">
+        <div class="pulse"></div> Sync Cloud Active
+      </div>
+    </div>
+
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-label">Articles en ligne</div>
+        <div class="kpi-value" id="totalItems">0</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Valeur du Stock</div>
+        <div class="kpi-value" id="totalValue">0,00 €</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Profit Potentiel</div>
+        <div class="kpi-value" style="color: var(--green);" id="totalProfit">+0,00 €</div>
+      </div>
+    </div>
+
+    <div class="table-card">
+      <table>
+        <thead>
+          <tr>
+            <th>Article</th>
+            <th>Prix de vente</th>
+            <th>Prix d'achat est.</th>
+            <th>Profit estimé</th>
+            <th>Lien Vinted</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody">
+          <!-- Injecté dynamiquement -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    // URL directe vers le fichier data.json stocké sur GitHub
+    const DATA_URL = "https://raw.githubusercontent.com/fishys-oss/vinted-dashboard/main/data.json";
+
+    async function loadData() {
+      try {
+        const res = await fetch(DATA_URL + '?t=' + new Date().getTime());
+        const items = await res.json();
+        
+        let sumValue = 0;
+        let sumProfit = 0;
+
+        const tbody = document.getElementById('tableBody');
+        tbody.innerHTML = items.map(item => {
+          const buyPrice = item.price * 0.5;
+          const profit = item.price - buyPrice;
+
+          sumValue += item.price;
+          sumProfit += profit;
+
+          return `
+            <tr>
+              <td><span class="item-title">${item.title}</span></td>
+              <td><strong>${item.price.toFixed(2)} €</strong></td>
+              <td style="color: var(--text-muted);">${buyPrice.toFixed(2)} €</td>
+              <td><span class="profit-tag">+${profit.toFixed(2)} €</span></td>
+              <td><a href="${item.url}" target="_blank" class="btn-action">Voir sur Vinted ↗</a></td>
+            </tr>
+          `;
+        }).join('');
+
+        document.getElementById('totalItems').innerText = items.length;
+        document.getElementById('totalValue').innerText = sumValue.toFixed(2) + ' €';
+        document.getElementById('totalProfit').innerText = '+' + sumProfit.toFixed(2) + ' €';
+
+      } catch (err) {
+        console.log("Mise à jour des données...");
+      }
+    }
+
+    loadData();
+    setInterval(loadData, 10000);
+  </script>
+</body>
+</html>
