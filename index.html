@@ -13,6 +13,7 @@
       --accent-bg: rgba(16, 185, 129, 0.1);
       --text: #f8fafc;
       --subtext: #64748b;
+      --sold: #ef4444;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -71,7 +72,7 @@
 
     .stats {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(4, 1fr);
       gap: 1rem;
       margin-bottom: 2rem;
     }
@@ -92,7 +93,7 @@
     }
 
     .card .val {
-      font-size: 1.75rem;
+      font-size: 1.5rem;
       font-weight: 700;
     }
 
@@ -102,7 +103,7 @@
       background: var(--card);
       border: 1px solid var(--card-border);
       border-radius: 10px;
-      overflow: hidden;
+      overflow-x: auto;
     }
 
     table {
@@ -117,12 +118,12 @@
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.05em;
-      padding: 1rem 1.5rem;
+      padding: 1rem 1.25rem;
       border-bottom: 1px solid var(--card-border);
     }
 
     td {
-      padding: 1rem 1.5rem;
+      padding: 0.85rem 1.25rem;
       font-size: 0.875rem;
       border-bottom: 1px solid var(--card-border);
     }
@@ -136,6 +137,40 @@
     }
 
     td a:hover { color: var(--text); }
+
+    input[type="number"] {
+      background: #0f172a;
+      border: 1px solid var(--card-border);
+      color: var(--text);
+      padding: 0.4rem 0.6rem;
+      border-radius: 6px;
+      width: 80px;
+      font-size: 0.85rem;
+    }
+
+    input[type="number"]:focus {
+      outline: 1px solid var(--accent);
+    }
+
+    .btn-status {
+      padding: 0.3rem 0.6rem;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+    }
+
+    .btn-online { background: rgba(16, 185, 129, 0.15); color: var(--accent); }
+    .btn-sold { background: rgba(239, 68, 68, 0.15); color: var(--sold); }
+
+    .tag-etat {
+      background: #1e293b;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      color: var(--subtext);
+    }
   </style>
 </head>
 <body>
@@ -143,14 +178,14 @@
   <div class="header">
     <div class="header-title">
       <h1>Vinted Business Suite</h1>
-      <p>Analyse automatique du catalogue</p>
+      <p>Analyse automatique et gestion des bénéfices</p>
     </div>
     <div class="badge">● Sync Cloud Active</div>
   </div>
 
   <div class="stats">
     <div class="card">
-      <label>Articles en ligne</label>
+      <label>Stock en Ligne</label>
       <div class="val" id="total-items">0</div>
     </div>
     <div class="card">
@@ -158,8 +193,12 @@
       <div class="val" id="total-value">0.00 €</div>
     </div>
     <div class="card">
-      <label>Profit Potentiel</label>
-      <div class="val green" id="potential-profit">+0.00 €</div>
+      <label>Investissement Total</label>
+      <div class="val" id="total-cost">0.00 €</div>
+    </div>
+    <div class="card">
+      <label>Bénéfice Réalisé / Potentiel</label>
+      <div class="val green" id="total-profit">+0.00 €</div>
     </div>
   </div>
 
@@ -168,63 +207,138 @@
       <thead>
         <tr>
           <th>ARTICLE</th>
-          <th>PRIX DE VENTE</th>
-          <th>PRIX D'ACHAT EST.</th>
-          <th>PROFIT ESTIMÉ</th>
-          <th>LIEN VINTED</th>
+          <th>DATE PUB.</th>
+          <th>ÉTAT</th>
+          <th>PRIX ACHAT (€)</th>
+          <th>PRIX VENTE (€)</th>
+          <th>BÉNÉFICE</th>
+          <th>STATUT</th>
+          <th>LIEN</th>
         </tr>
       </thead>
       <tbody id="items-list">
         <tr>
-          <td colspan="5" style="text-align:center; color: var(--subtext);">Chargement...</td>
+          <td colspan="8" style="text-align:center; color: var(--subtext);">Chargement...</td>
         </tr>
       </tbody>
     </table>
   </div>
 
   <script>
+    let localData = JSON.parse(localStorage.getItem('vinted_user_data') || '{}');
+
+    function saveData() {
+      localStorage.setItem('vinted_user_data', JSON.stringify(localData));
+    }
+
     async function loadDashboard() {
       try {
-        // Lecture locale directe du fichier data.json servi par Vercel
         const res = await fetch('./data.json?t=' + Date.now());
-        if (!res.ok) throw new Error("Erreur de lecture du fichier data.json");
+        if (!res.ok) throw new Error("Erreur de lecture");
 
         const items = await res.json();
-
         if (!Array.isArray(items) || items.length === 0) {
-          document.getElementById("items-list").innerHTML = '<tr><td colspan="5" style="text-align:center; color: var(--subtext);">Aucun article dans data.json.</td></tr>';
+          document.getElementById("items-list").innerHTML = '<tr><td colspan="8" style="text-align:center; color: var(--subtext);">Aucun article trouvé.</td></tr>';
           return;
         }
 
-        const totalItems = items.length;
-        const totalValue = items.reduce((acc, item) => acc + (Number(item.price) || 0), 0);
-        const estimatedProfit = totalValue * 0.5;
-
-        document.getElementById("total-items").innerText = totalItems;
-        document.getElementById("total-value").innerText = totalValue.toFixed(2) + " €";
-        document.getElementById("potential-profit").innerText = "+" + estimatedProfit.toFixed(2) + " €";
-
-        const tbody = document.getElementById("items-list");
-        tbody.innerHTML = items.map(item => {
-          const price = Number(item.price) || 0;
-          const cost = price * 0.5;
-          const profit = price - cost;
-
-          return `
-            <tr>
-              <td><strong>${item.title || 'Article'}</strong></td>
-              <td>${price.toFixed(2)} €</td>
-              <td style="color: var(--subtext);">${cost.toFixed(2)} €</td>
-              <td style="color: var(--accent);">+${profit.toFixed(2)} €</td>
-              <td><a href="${item.url}" target="_blank">Voir l'article ↗</a></td>
-            </tr>
-          `;
-        }).join("");
+        renderTable(items);
 
       } catch (err) {
         console.error(err);
-        document.getElementById("items-list").innerHTML = '<tr><td colspan="5" style="text-align:center; color: #ef4444;">Erreur d\'accès au fichier data.json.</td></tr>';
+        document.getElementById("items-list").innerHTML = '<tr><td colspan="8" style="text-align:center; color: #ef4444;">Erreur d\'accès aux données.</td></tr>';
       }
+    }
+
+    function renderTable(items) {
+      let onlineCount = 0;
+      let totalStockValue = 0;
+      let totalCost = 0;
+      let totalProfit = 0;
+
+      const tbody = document.getElementById("items-list");
+      tbody.innerHTML = items.map(item => {
+        const id = item.id;
+
+        // Récupération des données utilisateur locales ou valeurs par défaut
+        if (!localData[id]) {
+          localData[id] = {
+            cost: 0,
+            salePrice: item.price || 0,
+            isSold: false
+          };
+        }
+
+        const userItem = localData[id];
+        const currentCost = parseFloat(userItem.cost) || 0;
+        const currentSalePrice = parseFloat(userItem.salePrice);
+        const isSold = userItem.isSold;
+
+        const profit = currentSalePrice - currentCost;
+
+        if (isSold) {
+          totalProfit += profit;
+        } else {
+          onlineCount++;
+          totalStockValue += currentSalePrice;
+          totalCost += currentCost;
+          totalProfit += profit;
+        }
+
+        const pubDate = item.scraped_at ? new Date(item.scraped_at).toLocaleDateString('fr-FR') : '—';
+        const etat = item.status || 'Très bon état';
+
+        return `
+          <tr>
+            <td><strong>${item.title || 'Article'}</strong></td>
+            <td style="color: var(--subtext); font-size: 0.8rem;">${pubDate}</td>
+            <td><span class="tag-etat">${etat}</span></td>
+            <td>
+              <input type="number" step="0.5" value="${currentCost}" onchange="updateCost('${id}', this.value)" />
+            </td>
+            <td>
+              <input type="number" step="0.5" value="${currentSalePrice}" onchange="updateSalePrice('${id}', this.value)" />
+            </td>
+            <td style="color: ${profit >= 0 ? 'var(--accent)' : 'var(--sold)'}; font-weight: 600;">
+              ${profit >= 0 ? '+' : ''}${profit.toFixed(2)} €
+            </td>
+            <td>
+              <button class="btn-status ${isSold ? 'btn-sold' : 'btn-online'}" onclick="toggleStatus('${id}')">
+                ${isSold ? 'Vendu' : 'En ligne'}
+              </button>
+            </td>
+            <td><a href="${item.url}" target="_blank">Voir ↗</a></td>
+          </tr>
+        `;
+      }).join("");
+
+      document.getElementById("total-items").innerText = onlineCount;
+      document.getElementById("total-value").innerText = totalStockValue.toFixed(2) + " €";
+      document.getElementById("total-cost").innerText = totalCost.toFixed(2) + " €";
+      document.getElementById("total-profit").innerText = (totalProfit >= 0 ? "+" : "") + totalProfit.toFixed(2) + " €";
+
+      saveData();
+    }
+
+    function updateCost(id, val) {
+      if (!localData[id]) localData[id] = {};
+      localData[id].cost = parseFloat(val) || 0;
+      saveData();
+      loadDashboard();
+    }
+
+    function updateSalePrice(id, val) {
+      if (!localData[id]) localData[id] = {};
+      localData[id].salePrice = parseFloat(val) || 0;
+      saveData();
+      loadDashboard();
+    }
+
+    function toggleStatus(id) {
+      if (!localData[id]) localData[id] = {};
+      localData[id].isSold = !localData[id].isSold;
+      saveData();
+      loadDashboard();
     }
 
     loadDashboard();
