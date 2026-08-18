@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 import requests
 
 # ⚠️ REMPLACE PAR L'URL DE TON PROFIL VINTED
-VINTED_URL = "https://www.vinted.fr/member/123456789-monprofil"
+VINTED_URL = "https://www.vinted.fr/member/249331091"
 
 HEADERS = {
     "User-Agent": (
