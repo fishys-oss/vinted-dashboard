@@ -15,6 +15,7 @@
       --subtext: #64748b;
       --sold: #ef4444;
       --warning: #f59e0b;
+      --blue: #3b82f6;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -31,6 +32,12 @@
       justify-content: space-between;
       align-items: center;
       margin-bottom: 1.5rem;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
     }
 
     .btn-inbox {
@@ -55,6 +62,16 @@
       font-weight: 700;
     }
 
+    .btn-export {
+      background: var(--accent-bg);
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
     .inbox-modal {
       background: rgba(245, 158, 11, 0.08);
       border: 1px solid var(--warning);
@@ -71,10 +88,7 @@
       margin-bottom: 0.75rem;
     }
 
-    .inbox-title {
-      color: var(--warning);
-      font-weight: 700;
-    }
+    .inbox-title { color: var(--warning); font-weight: 700; }
 
     .notif-item {
       display: flex;
@@ -87,17 +101,8 @@
       border: 1px solid var(--card-border);
     }
 
-    .notif-info {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-    }
-
-    .notif-actions {
-      display: flex;
-      gap: 0.5rem;
-      align-items: center;
-    }
+    .notif-info { display: flex; align-items: center; gap: 0.75rem; }
+    .notif-actions { display: flex; gap: 0.5rem; align-items: center; }
 
     .btn {
       padding: 0.4rem 0.8rem;
@@ -112,11 +117,12 @@
     .btn-cancel { background: #334155; color: var(--text); }
     .btn-reset { background: #d97706; color: white; margin-left: auto; }
 
+    /* Key Stats Grid */
     .stats {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(6, 1fr);
       gap: 1rem;
-      margin-bottom: 2rem;
+      margin-bottom: 1.5rem;
     }
 
     .card {
@@ -134,10 +140,64 @@
       margin-bottom: 0.5rem;
     }
 
-    .card .val { font-size: 1.5rem; font-weight: 700; }
+    .card .val { font-size: 1.35rem; font-weight: 700; }
     .card .val.green { color: var(--accent); }
     .card .val.red { color: var(--sold); }
 
+    /* Tabs Navigation */
+    .nav-tabs {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+      border-bottom: 1px solid var(--card-border);
+      padding-bottom: 0.5rem;
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--subtext);
+      padding: 0.5rem 1rem;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      border-radius: 6px;
+    }
+
+    .tab-btn.active {
+      background: var(--card);
+      color: var(--text);
+      border: 1px solid var(--card-border);
+    }
+
+    /* Filters Bar */
+    .filters-bar {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      align-items: center;
+    }
+
+    .search-input {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      color: var(--text);
+      padding: 0.5rem 0.8rem;
+      border-radius: 8px;
+      width: 250px;
+      font-size: 0.85rem;
+    }
+
+    .filter-select {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      color: var(--text);
+      padding: 0.5rem 0.8rem;
+      border-radius: 8px;
+      font-size: 0.85rem;
+    }
+
+    /* Table Container */
     .table-container {
       background: var(--card);
       border: 1px solid var(--card-border);
@@ -156,11 +216,7 @@
     }
     td { padding: 0.85rem 1rem; font-size: 0.875rem; border-bottom: 1px solid var(--card-border); }
 
-    .item-cell {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-    }
+    .item-cell { display: flex; align-items: center; gap: 0.75rem; }
 
     .item-img {
       width: 42px;
@@ -198,15 +254,51 @@
     .st-pending { background: rgba(245, 158, 11, 0.15); color: var(--warning); }
     .st-sold { background: rgba(16, 185, 129, 0.15); color: var(--accent); }
     .st-removed { background: rgba(239, 68, 68, 0.15); color: var(--sold); }
+
+    /* Calculator View */
+    .calc-box {
+      max-width: 500px;
+      margin: 0 auto;
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 1.5rem;
+    }
+
+    .calc-group { margin-bottom: 1rem; }
+    .calc-group label { display: block; font-size: 0.8rem; color: var(--subtext); margin-bottom: 0.3rem; }
+    .calc-group input {
+      width: 100%;
+      background: #0f172a;
+      border: 1px solid var(--card-border);
+      color: var(--text);
+      padding: 0.6rem;
+      border-radius: 6px;
+    }
+
+    .calc-res {
+      margin-top: 1.5rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--card-border);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
   </style>
 </head>
 <body>
 
   <div class="header">
     <h1>Vinted Business Suite</h1>
-    <button class="btn-inbox" onclick="toggleInbox()">
-      📥 Boîte de réception <span class="count" id="inbox-count">0</span>
-    </button>
+    <div class="header-actions">
+      <button class="btn-export" onclick="exportCSV()">📥 Exporter CSV</button>
+      <button class="btn-inbox" onclick="toggleInbox()">
+        📥 Boîte de réception <span class="count" id="inbox-count">0</span>
+      </button>
+    </div>
   </div>
 
   <div id="inbox-modal" class="inbox-modal">
@@ -222,28 +314,97 @@
     <div class="card"><label>Valeur Estimée Stock</label><div class="val" id="total-value">0.00 €</div></div>
     <div class="card"><label>Total Investi</label><div class="val" id="total-cost">0.00 €</div></div>
     <div class="card"><label>Bénéfice Net Global</label><div class="val" id="total-profit">0.00 €</div></div>
+    <div class="card"><label>Bénéfice Moyen / Vente</label><div class="val green" id="avg-profit">0.00 €</div></div>
+    <div class="card"><label>Marge Moyenne (%)</label><div class="val green" id="avg-margin">0%</div></div>
   </div>
 
-  <div class="table-container">
-    <table>
-      <thead>
-        <tr>
-          <th>Article</th>
-          <th>Date Pub.</th>
-          <th>Achat (€)</th>
-          <th>Vente (€)</th>
-          <th>Bénéfice</th>
-          <th>Statut</th>
-          <th>Lien</th>
-        </tr>
-      </thead>
-      <tbody id="items-list">
-        <tr><td colspan="7" style="text-align:center;">Chargement...</td></tr>
-      </tbody>
-    </table>
+  <!-- Tab Buttons -->
+  <div class="nav-tabs">
+    <button class="tab-btn active" onclick="switchTab('stock')">📦 Stock Actuel</button>
+    <button class="tab-btn" onclick="switchTab('sales')">📜 Historique des Ventes</button>
+    <button class="tab-btn" onclick="switchTab('calc')">🧮 Calculateur Prix & Marges</button>
+  </div>
+
+  <!-- TAB 1: Stock Actuel -->
+  <div id="tab-stock" class="tab-content active">
+    <div class="filters-bar">
+      <input type="text" id="search-stock" class="search-input" placeholder="🔍 Rechercher un article..." oninput="applyFilters()" />
+      <select id="filter-status" class="filter-select" onchange="applyFilters()">
+        <option value="all">Tous les statuts</option>
+        <option value="online">En ligne</option>
+        <option value="sold">Vendus</option>
+        <option value="removed">Retirés</option>
+      </select>
+    </div>
+
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Article</th>
+            <th>Date Pub.</th>
+            <th>Achat (€)</th>
+            <th>Vente (€)</th>
+            <th>Bénéfice</th>
+            <th>Statut</th>
+            <th>Lien</th>
+          </tr>
+        </thead>
+        <tbody id="items-list">
+          <tr><td colspan="7" style="text-align:center;">Chargement...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- TAB 2: Historique des Ventes -->
+  <div id="tab-sales" class="tab-content">
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Article Vendu</th>
+            <th>Prix d'Achat (€)</th>
+            <th>Prix de Vente (€)</th>
+            <th>Bénéfice Net (€)</th>
+            <th>Marge (%)</th>
+          </tr>
+        </thead>
+        <tbody id="sales-list">
+          <tr><td colspan="5" style="text-align:center;">Aucune vente enregistrée pour l'instant.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- TAB 3: Calculateur de Prix -->
+  <div id="tab-calc" class="tab-content">
+    <div class="calc-box">
+      <h3 style="margin-bottom: 1rem;">Calculateur de Marge Vinted</h3>
+      <div class="calc-group">
+        <label>Prix d'Achat (€)</label>
+        <input type="number" id="calc-cost" value="5.00" step="0.5" oninput="runCalculator()" />
+      </div>
+      <div class="calc-group">
+        <label>Prix de Vente Souhaité (€)</label>
+        <input type="number" id="calc-price" value="15.00" step="0.5" oninput="runCalculator()" />
+      </div>
+
+      <div class="calc-res">
+        <div>
+          <label>Bénéfice Estimmé</label>
+          <div class="val green" id="calc-profit-val">10.00 €</div>
+        </div>
+        <div>
+          <label>Marge Générée</label>
+          <div class="val green" id="calc-margin-val">200%</div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script>
+    let rawItems = [];
     let userStore = JSON.parse(localStorage.getItem('vinted_user_store') || '{}');
 
     function saveStore() {
@@ -252,30 +413,19 @@
 
     async function initDashboard() {
       const res = await fetch('./data.json?t=' + Date.now());
-      const items = await res.json();
+      rawItems = await res.json();
 
       let pendingNotifs = [];
 
-      items.forEach(item => {
+      rawItems.forEach(item => {
         const id = item.id;
-        
-        // Si l'article est présent dans le JSON actuel (donc en ligne)
         if (!item.is_pending) {
           if (!userStore[id]) {
-            userStore[id] = {
-              cost: 1.00,
-              salePrice: 0.00,
-              vintedPrice: item.price,
-              status: 'online'
-            };
-          } else {
-            // Forcer le statut "online" si l'article est présent dans data.json
-            if (userStore[id].status === 'pending') {
-              userStore[id].status = 'online';
-            }
+            userStore[id] = { cost: 1.00, salePrice: 0.00, vintedPrice: item.price, status: 'online' };
+          } else if (userStore[id].status === 'pending') {
+            userStore[id].status = 'online';
           }
         } else {
-          // L'article n'est plus présent dans la recherche Vinted
           if (!userStore[id]) {
             userStore[id] = { cost: 1.00, salePrice: 0.00, vintedPrice: item.price, status: 'pending' };
           } else if (userStore[id].status === 'online') {
@@ -290,7 +440,25 @@
 
       saveStore();
       updateInboxUI(pendingNotifs);
-      renderDashboard(items);
+      applyFilters();
+      runCalculator();
+    }
+
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+      if (tabName === 'stock') {
+        document.querySelectorAll('.tab-btn')[0].classList.add('active');
+        document.getElementById('tab-stock').classList.add('active');
+      } else if (tabName === 'sales') {
+        document.querySelectorAll('.tab-btn')[1].classList.add('active');
+        document.getElementById('tab-sales').classList.add('active');
+        renderSalesHistory();
+      } else if (tabName === 'calc') {
+        document.querySelectorAll('.tab-btn')[2].classList.add('active');
+        document.getElementById('tab-calc').classList.add('active');
+      }
     }
 
     function updateInboxUI(notifs) {
@@ -337,8 +505,26 @@
       modal.style.display = modal.style.display === 'block' ? 'none' : 'block';
     }
 
+    function applyFilters() {
+      const search = document.getElementById('search-stock').value.toLowerCase();
+      const statusFilter = document.getElementById('filter-status').value;
+
+      const filtered = rawItems.filter(item => {
+        const id = item.id;
+        const meta = userStore[id] || { status: 'online' };
+
+        const matchesSearch = item.title.toLowerCase().includes(search);
+        const matchesStatus = statusFilter === 'all' || meta.status === statusFilter;
+
+        return matchesSearch && matchesStatus;
+      });
+
+      renderDashboard(filtered);
+    }
+
     function renderDashboard(items) {
       let onlineCount = 0, totalStockValue = 0, totalCost = 0, totalProfit = 0;
+      let soldCount = 0, totalSoldProfit = 0, totalSoldCost = 0;
 
       const tbody = document.getElementById('items-list');
       tbody.innerHTML = items.map(item => {
@@ -355,6 +541,12 @@
         if (meta.status === 'online') {
           onlineCount++;
           totalStockValue += (item.price || 0);
+        }
+
+        if (meta.status === 'sold') {
+          soldCount++;
+          totalSoldProfit += profit;
+          totalSoldCost += cost;
         }
 
         let statusBadge = '<span class="badge-status st-online">En ligne</span>';
@@ -382,6 +574,7 @@
         `;
       }).join('');
 
+      // Metrics update
       const profitElem = document.getElementById('total-profit');
       profitElem.innerText = (totalProfit >= 0 ? "+" : "") + totalProfit.toFixed(2) + " €";
       profitElem.className = "val " + (totalProfit >= 0 ? "green" : "red");
@@ -389,6 +582,73 @@
       document.getElementById('total-items').innerText = onlineCount;
       document.getElementById('total-value').innerText = totalStockValue.toFixed(2) + " €";
       document.getElementById('total-cost').innerText = totalCost.toFixed(2) + " €";
+
+      // Sales Metrics
+      const avgProfit = soldCount > 0 ? (totalSoldProfit / soldCount) : 0;
+      const avgMargin = totalSoldCost > 0 ? ((totalSoldProfit / totalSoldCost) * 100) : 0;
+
+      document.getElementById('avg-profit').innerText = avgProfit.toFixed(2) + " €";
+      document.getElementById('avg-margin').innerText = avgMargin.toFixed(0) + "%";
+    }
+
+    function renderSalesHistory() {
+      const salesBody = document.getElementById('sales-list');
+      const soldItems = rawItems.filter(item => userStore[item.id] && userStore[item.id].status === 'sold');
+
+      if (soldItems.length === 0) {
+        salesBody.innerHTML = `<tr><td colspan="5" style="text-align:center;">Aucune vente enregistrée pour l'instant.</td></tr>`;
+        return;
+      }
+
+      salesBody.innerHTML = soldItems.map(item => {
+        const meta = userStore[item.id];
+        const cost = parseFloat(meta.cost) || 0;
+        const sale = parseFloat(meta.salePrice) || 0;
+        const profit = sale - cost;
+        const margin = cost > 0 ? ((profit / cost) * 100) : 0;
+
+        return `
+          <tr>
+            <td>
+              <div class="item-cell">
+                <img src="${item.image_url}" class="item-img" onerror="this.src='https://via.placeholder.com/42?text=Vinted'" />
+                <strong>${item.title}</strong>
+              </div>
+            </td>
+            <td>${cost.toFixed(2)} €</td>
+            <td>${sale.toFixed(2)} €</td>
+            <td style="color:${profit >= 0 ? 'var(--accent)' : 'var(--sold)'}; font-weight:bold;">
+              ${profit >= 0 ? '+' : ''}${profit.toFixed(2)} €
+            </td>
+            <td>${margin.toFixed(0)} %</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function runCalculator() {
+      const cost = parseFloat(document.getElementById('calc-cost').value) || 0;
+      const price = parseFloat(document.getElementById('calc-price').value) || 0;
+      const profit = price - cost;
+      const margin = cost > 0 ? ((profit / cost) * 100) : 0;
+
+      document.getElementById('calc-profit-val').innerText = profit.toFixed(2) + " €";
+      document.getElementById('calc-margin-val').innerText = margin.toFixed(0) + "%";
+    }
+
+    function exportCSV() {
+      let csv = "ID,Titre,Prix Vinted,Cout Achat,Prix Vente,Statut,Statut Lien\n";
+
+      rawItems.forEach(item => {
+        const meta = userStore[item.id] || {};
+        csv += `"${item.id}","${item.title.replace(/"/g, '""')}",${item.price},${meta.cost || 0},${meta.salePrice || 0},"${meta.status || 'online'}","${item.url}"\n`;
+      });
+
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = `vinted_inventory_${new Date().toISOString().slice(0,10)}.csv`;
+      link.click();
     }
 
     function confirmSale(id) {
