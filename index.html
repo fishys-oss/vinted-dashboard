@@ -6,89 +6,144 @@
   <title>Vinted Business Suite</title>
   <style>
     :root {
-      --bg: #0f172a;
-      --card: #1e293b;
+      --bg: #0b0f17;
+      --card: #151c28;
+      --card-border: #1e293b;
       --accent: #10b981;
+      --accent-bg: rgba(16, 185, 129, 0.1);
       --text: #f8fafc;
-      --subtext: #94a3b8;
-      --border: #334155;
+      --subtext: #64748b;
     }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
     body {
       background-color: var(--bg);
       color: var(--text);
-      font-family: system-ui, -apple-system, sans-serif;
-      margin: 0;
-      padding: 2rem;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      padding: 2.5rem;
     }
+
     .header {
       display: flex;
       justify-content: space-between;
-      align-items: center;
+      align-items: flex-start;
       margin-bottom: 2rem;
     }
-    .badge {
-      background: rgba(16, 185, 129, 0.1);
-      color: var(--accent);
-      padding: 0.5rem 1rem;
-      border-radius: 9999px;
+
+    .header-title h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .header-title h1::before {
+      content: "V";
+      background: #8b5cf6;
+      color: white;
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+    }
+
+    .header-title p {
+      color: var(--subtext);
       font-size: 0.875rem;
+      margin-top: 0.25rem;
+      margin-left: 2.75rem;
+    }
+
+    .badge {
+      background: var(--accent-bg);
+      color: var(--accent);
+      padding: 0.4rem 0.8rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
       border: 1px solid rgba(16, 185, 129, 0.2);
     }
+
     .stats {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      grid-template-columns: repeat(3, 1fr);
       gap: 1rem;
       margin-bottom: 2rem;
     }
+
     .card {
       background: var(--card);
-      padding: 1.5rem;
-      border-radius: 12px;
-      border: 1px solid var(--border);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 1.25rem 1.5rem;
     }
+
     .card label {
       color: var(--subtext);
-      font-size: 0.875rem;
+      font-size: 0.75rem;
+      font-weight: 600;
       display: block;
       margin-bottom: 0.5rem;
     }
+
     .card .val {
-      font-size: 1.875rem;
-      font-weight: bold;
+      font-size: 1.75rem;
+      font-weight: 700;
     }
+
+    .card .val.green { color: var(--accent); }
+
+    .table-container {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
     table {
       width: 100%;
       border-collapse: collapse;
-      background: var(--card);
-      border-radius: 12px;
-      overflow: hidden;
-      border: 1px solid var(--border);
-    }
-    th, td {
-      padding: 1rem;
       text-align: left;
-      border-bottom: 1px solid var(--border);
     }
+
     th {
       color: var(--subtext);
-      font-size: 0.75rem;
+      font-size: 0.7rem;
+      font-weight: 700;
       text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid var(--card-border);
     }
-    a {
-      color: var(--accent);
+
+    td {
+      padding: 1rem 1.5rem;
+      font-size: 0.875rem;
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    tr:last-child td { border-bottom: none; }
+
+    td a {
+      color: #94a3b8;
       text-decoration: none;
+      font-size: 0.8rem;
     }
-    a:hover {
-      text-decoration: underline;
-    }
+
+    td a:hover { color: var(--text); }
   </style>
 </head>
 <body>
 
   <div class="header">
-    <div>
-      <h1 style="margin:0;">Vinted Business Suite</h1>
-      <p style="color:var(--subtext); margin:0.25rem 0 0 0;">Analyse automatique du catalogue</p>
+    <div class="header-title">
+      <h1>Vinted Business Suite</h1>
+      <p>Analyse automatique du catalogue</p>
     </div>
     <div class="badge">● Sync Cloud Active</div>
   </div>
@@ -103,65 +158,72 @@
       <div class="val" id="total-value">0.00 €</div>
     </div>
     <div class="card">
-      <label>Profit Potentiel (Est. 50%)</label>
-      <div class="val" id="potential-profit" style="color:var(--accent);">+0.00 €</div>
+      <label>Profit Potentiel</label>
+      <div class="val green" id="potential-profit">+0.00 €</div>
     </div>
   </div>
 
-  <table>
-    <thead>
-      <tr>
-        <th>Article</th>
-        <th>Prix de Vente</th>
-        <th>Lien Vinted</th>
-      </tr>
-    </thead>
-    <tbody id="items-list">
-      <tr>
-        <td colspan="3" style="text-align:center; color:var(--subtext);">Chargement des données...</td>
-      </tr>
-    </tbody>
-  </table>
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>ARTICLE</th>
+          <th>PRIX DE VENTE</th>
+          <th>PRIX D'ACHAT EST.</th>
+          <th>PROFIT ESTIMÉ</th>
+          <th>LIEN VINTED</th>
+        </tr>
+      </thead>
+      <tbody id="items-list">
+        <tr>
+          <td colspan="5" style="text-align:center; color: var(--subtext);">Chargement...</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 
   <script>
-    // URL brute de ton fichier data.json sur GitHub
-    const DATA_URL = "https://raw.githubusercontent.com/fishys-oss/vinted-dashboard/main/data.json";
-
     async function loadDashboard() {
       try {
-        // Le paramètre ?t= force la mise à jour immédiate en évitant le cache
-        const res = await fetch(`${DATA_URL}?t=${Date.now()}`);
-        if (!res.ok) throw new Error("Fichier introuvable");
+        // Lecture locale directe du fichier data.json servi par Vercel
+        const res = await fetch('./data.json?t=' + Date.now());
+        if (!res.ok) throw new Error("Erreur de lecture du fichier data.json");
 
         const items = await res.json();
-        
-        const totalItems = items.length;
-        const totalValue = items.reduce((acc, item) => acc + (item.price || 0), 0);
-        const estimatedProfit = totalValue * 0.5; // Estimation de marge à 50%
 
-        // Mise à jour des cartes
+        if (!Array.isArray(items) || items.length === 0) {
+          document.getElementById("items-list").innerHTML = '<tr><td colspan="5" style="text-align:center; color: var(--subtext);">Aucun article dans data.json.</td></tr>';
+          return;
+        }
+
+        const totalItems = items.length;
+        const totalValue = items.reduce((acc, item) => acc + (Number(item.price) || 0), 0);
+        const estimatedProfit = totalValue * 0.5;
+
         document.getElementById("total-items").innerText = totalItems;
         document.getElementById("total-value").innerText = totalValue.toFixed(2) + " €";
         document.getElementById("potential-profit").innerText = "+" + estimatedProfit.toFixed(2) + " €";
 
-        // Remplissage du tableau
         const tbody = document.getElementById("items-list");
-        if (items.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;">Aucun article trouvé.</td></tr>';
-          return;
-        }
+        tbody.innerHTML = items.map(item => {
+          const price = Number(item.price) || 0;
+          const cost = price * 0.5;
+          const profit = price - cost;
 
-        tbody.innerHTML = items.map(item => `
-          <tr>
-            <td><strong>${item.title}</strong></td>
-            <td>${item.price.toFixed(2)} €</td>
-            <td><a href="${item.url}" target="_blank">Voir sur Vinted ↗</a></td>
-          </tr>
-        `).join("");
+          return `
+            <tr>
+              <td><strong>${item.title || 'Article'}</strong></td>
+              <td>${price.toFixed(2)} €</td>
+              <td style="color: var(--subtext);">${cost.toFixed(2)} €</td>
+              <td style="color: var(--accent);">+${profit.toFixed(2)} €</td>
+              <td><a href="${item.url}" target="_blank">Voir l'article ↗</a></td>
+            </tr>
+          `;
+        }).join("");
 
       } catch (err) {
-        console.error("Erreur de chargement :", err);
-        document.getElementById("items-list").innerHTML = '<tr><td colspan="3" style="text-align:center; color:#ef4444;">Erreur lors du chargement des données.</td></tr>';
+        console.error(err);
+        document.getElementById("items-list").innerHTML = '<tr><td colspan="5" style="text-align:center; color: #ef4444;">Erreur d\'accès au fichier data.json.</td></tr>';
       }
     }
 
