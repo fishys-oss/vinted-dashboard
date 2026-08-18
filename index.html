@@ -668,8 +668,8 @@
         if (meta.status === 'sold') statusBadge = '<span class="badge-status st-sold">VENDU</span>';
         if (meta.status === 'removed') statusBadge = '<span class="badge-status st-removed">À REPUBLIER</span>';
 
-        // Utilisation de la taille récupérée depuis item.size ou item.subtitle, sinon valeur par défaut
-        const sizeText = item.size || item.subtitle || 'Taille L';
+        // Extraction robuste de la taille depuis le fichier JSON (size, taille, item_size ou subtitle)
+        const sizeText = item.size || item.taille || item.item_size || item.subtitle || 'Taille unique';
 
         return `
           <tr>
