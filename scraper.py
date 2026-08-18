@@ -25,32 +25,39 @@ def get_vinted_items():
   current_items = {}
 
   with sync_playwright() as p:
-    # Lancement rapide du navigateur
     browser = p.chromium.launch(
         headless=True,
-        args=["--no-sandbox", "--disable-setuid-sandbox"],
+        args=[
+            "--disable-blink-features=AutomationControlled",
+            "--no-sandbox",
+            "--disable-setuid-sandbox",
+        ],
     )
 
     context = browser.new_context(
         user_agent=(
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
-            " (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
+            " (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
         ),
+        viewport={"width": 1400, "height": 900},
         locale="fr-FR",
-        viewport={"width": 1280, "height": 800},
     )
-    page = context.new_page()
 
-    # Bloquer les images et CSS superflus pour gagner du temps
-    page.route(
-        "**/*.{png,jpg,jpeg,svg,webp,css,woff,woff2}",
-        lambda route: route.abort(),
+    # Masquer l'indicateur d'automatisation Playwright
+    page = context.new_page()
+    page.add_init_script(
+        "Object.defineProperty(navigator, 'webdriver', {get: () =>"
+        " undefined})"
     )
 
     try:
-      # Max 15s de chargement
-      page.goto(profile_url, wait_until="commit", timeout=15000)
-      page.wait_for_selector(".feed-grid__item, .item-box", timeout=10000)
+      page.goto(profile_url, wait_until="networkidle", timeout=30000)
+
+      # Scroll fluide pour déclencher le chargement des images (Lazy-Loading)
+      page.evaluate("window.scrollTo(0, document.body.scrollHeight / 2)")
+      page.wait_for_timeout(1000)
+      page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
+      page.wait_for_timeout(1500)
 
       soup = BeautifulSoup(page.content(), "html.parser")
       cards = soup.select(
@@ -87,6 +94,7 @@ def get_vinted_items():
                 href if href.startswith("http") else f"https://www.vinted.fr{href}"
             )
 
+          # Extraction forcée de l'image
           img_url = ""
           if img_elem:
             img_url = (
@@ -94,6 +102,7 @@ def get_vinted_items():
                 or img_elem.get("data-src")
                 or img_elem.get("data-srcset", "").split(" ")[0]
                 or img_elem.get("srcset", "").split(" ")[0]
+                or ""
             )
 
           item_id = (
@@ -102,12 +111,10 @@ def get_vinted_items():
               else str(hash(title + str(price)))
           )
 
+          # Date fixe de première détection
           published_at = previous_items.get(item_id, {}).get("published_at")
           if not published_at:
             published_at = datetime.now().strftime("%d/%m/%Y")
-
-          if not img_url and item_id in previous_items:
-            img_url = previous_items[item_id].get("image_url", "")
 
           current_items[item_id] = {
               "id": item_id,
@@ -125,8 +132,12 @@ def get_vinted_items():
     finally:
       browser.close()
 
-  final_items = []
+  # Sécurité : Si aucun article n'a été trouvé (ex: blocage), on ne vide pas tout par erreur
+  if not current_items and previous_items:
+    print("Avertissement: Aucun article récupéré. Conservation de l'ancien état.")
+    return
 
+  final_items = []
   for item_id, item in current_items.items():
     final_items.append(item)
 
