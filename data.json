@@ -4,34 +4,39 @@
     "title": "Umbro",
     "price": 7.0,
     "url": "https://www.vinted.fr/items/9688872296",
-    "scraped_at": "2026-08-18T15:36:29.676457"
+    "scraped_at": "2026-08-18T15:36:29.676457",
+    "is_pending": true
   },
   {
     "id": "9688815472",
     "title": "BZB",
     "price": 3.0,
     "url": "https://www.vinted.fr/items/9688815472",
-    "scraped_at": "2026-08-18T15:36:29.677511"
+    "scraped_at": "2026-08-18T15:36:29.677511",
+    "is_pending": true
   },
   {
     "id": "9688789337",
     "title": "kreemo",
     "price": 6.0,
     "url": "https://www.vinted.fr/items/9688789337",
-    "scraped_at": "2026-08-18T15:36:29.678560"
+    "scraped_at": "2026-08-18T15:36:29.678560",
+    "is_pending": true
   },
   {
     "id": "9688743921",
     "title": "Nike",
     "price": 8.0,
     "url": "https://www.vinted.fr/items/9688743921",
-    "scraped_at": "2026-08-18T15:36:29.679588"
+    "scraped_at": "2026-08-18T15:36:29.679588",
+    "is_pending": true
   },
   {
     "id": "9688687963",
     "title": "Nike",
     "price": 5.0,
     "url": "https://www.vinted.fr/items/9688687963",
-    "scraped_at": "2026-08-18T15:36:29.680600"
+    "scraped_at": "2026-08-18T15:36:29.680600",
+    "is_pending": true
   }
 ]
