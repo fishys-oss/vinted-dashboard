@@ -47,9 +47,6 @@
       color: var(--warning);
       font-weight: 700;
       margin-bottom: 0.75rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
     }
 
     .notif-item {
@@ -61,6 +58,12 @@
       border-radius: 8px;
       margin-top: 0.5rem;
       border: 1px solid var(--card-border);
+    }
+
+    .notif-info {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
     }
 
     .notif-actions {
@@ -105,6 +108,7 @@
 
     .card .val { font-size: 1.5rem; font-weight: 700; }
     .card .val.green { color: var(--accent); }
+    .card .val.red { color: var(--sold); }
 
     .table-container {
       background: var(--card);
@@ -124,6 +128,21 @@
     }
     td { padding: 0.85rem 1rem; font-size: 0.875rem; border-bottom: 1px solid var(--card-border); }
 
+    .item-cell {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .item-img {
+      width: 40px;
+      height: 40px;
+      border-radius: 6px;
+      object-fit: cover;
+      background: #0f172a;
+      border: 1px solid var(--card-border);
+    }
+
     input[type="number"] {
       background: #0f172a;
       border: 1px solid var(--card-border);
@@ -131,6 +150,12 @@
       padding: 0.3rem 0.5rem;
       border-radius: 6px;
       width: 75px;
+    }
+
+    input[type="number"]:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      background: #1e293b;
     }
 
     .badge-status {
@@ -143,8 +168,8 @@
 
     .st-online { background: rgba(16, 185, 129, 0.15); color: var(--accent); }
     .st-pending { background: rgba(245, 158, 11, 0.15); color: var(--warning); }
-    .st-sold { background: rgba(239, 68, 68, 0.15); color: var(--sold); }
-    .st-removed { background: rgba(148, 163, 184, 0.15); color: var(--subtext); }
+    .st-sold { background: rgba(16, 185, 129, 0.15); color: var(--accent); }
+    .st-removed { background: rgba(239, 68, 68, 0.15); color: var(--sold); }
   </style>
 </head>
 <body>
@@ -153,17 +178,17 @@
     <h1>Vinted Business Suite</h1>
   </div>
 
-  <!-- Zone de Notification Ventes Détectées -->
+  <!-- Zone de Notification -->
   <div id="notif-box" class="notif-box">
-    <div class="notif-title">⚠️ Article(s) retiré(s) de Vinted détecté(s)</div>
+    <div class="notif-title">⚠️ Article(s) ne figurant plus sur Vinted</div>
     <div id="notif-list"></div>
   </div>
 
   <div class="stats">
     <div class="card"><label>Stock en Ligne</label><div class="val" id="total-items">0</div></div>
-    <div class="card"><label>Valeur Stock</label><div class="val" id="total-value">0.00 €</div></div>
+    <div class="card"><label>Valeur Estimée Stock</label><div class="val" id="total-value">0.00 €</div></div>
     <div class="card"><label>Total Investi</label><div class="val" id="total-cost">0.00 €</div></div>
-    <div class="card"><label>Bénéfice Réalisé</label><div class="val green" id="total-profit">+0.00 €</div></div>
+    <div class="card"><label>Bénéfice Net Global</label><div class="val" id="total-profit">0.00 €</div></div>
   </div>
 
   <div class="table-container">
@@ -175,7 +200,7 @@
           <th>Achat (€)</th>
           <th>Vente (€)</th>
           <th>Bénéfice</th>
-          <th>État / Statut</th>
+          <th>Statut</th>
           <th>Lien</th>
         </tr>
       </thead>
@@ -202,8 +227,9 @@
         const id = item.id;
         if (!userStore[id]) {
           userStore[id] = {
-            cost: 1.00, // Prix d'achat par défaut fixé à 1€
-            salePrice: item.price,
+            cost: 1.00,        // Prix d'achat par défaut
+            salePrice: 0.00,    // Vente bloquée à 0 tant que c'est en ligne
+            vintedPrice: item.price,
             status: item.is_pending ? 'pending' : 'online'
           };
         } else if (item.is_pending && userStore[id].status === 'online') {
@@ -232,10 +258,13 @@
       box.style.display = 'block';
       list.innerHTML = notifs.map(item => `
         <div class="notif-item">
-          <span><strong>${item.title}</strong> n'est plus en ligne. A-t-il été vendu ?</span>
+          <div class="notif-info">
+            <img src="${item.image_url || 'https://via.placeholder.com/40'}" class="item-img" alt="" />
+            <span><strong>${item.title}</strong> n'est plus en ligne. A-t-il été vendu ?</span>
+          </div>
           <div class="notif-actions">
-            <span>Prix Vente :</span>
-            <input type="number" id="real-price-${item.id}" value="${item.salePrice}" step="0.5" />
+            <span>Prix Vendu (€) :</span>
+            <input type="number" id="real-price-${item.id}" value="${item.vintedPrice || 0}" step="0.5" />
             <button class="btn btn-confirm" onclick="confirmSale('${item.id}')">Oui, Vendu</button>
             <button class="btn btn-cancel" onclick="cancelSale('${item.id}')">Non, Supprimé</button>
           </div>
@@ -244,23 +273,23 @@
     }
 
     function renderDashboard(items) {
-      let onlineCount = 0, totalStockValue = 0, totalCost = 0, totalRealizedProfit = 0;
+      let onlineCount = 0, totalStockValue = 0, totalCost = 0, totalProfit = 0;
 
       const tbody = document.getElementById('items-list');
       tbody.innerHTML = items.map(item => {
         const id = item.id;
-        const meta = userStore[id] || { cost: 1.00, salePrice: item.price, status: 'online' };
+        const meta = userStore[id] || { cost: 1.00, salePrice: 0.00, status: 'online' };
 
         const cost = parseFloat(meta.cost) || 0;
-        const salePrice = parseFloat(meta.salePrice) || 0;
+        const salePrice = meta.status === 'sold' ? (parseFloat(meta.salePrice) || 0) : 0.00;
         const profit = salePrice - cost;
+
+        totalCost += cost;
+        totalProfit += profit;
 
         if (meta.status === 'online') {
           onlineCount++;
-          totalStockValue += salePrice;
-          totalCost += cost;
-        } else if (meta.status === 'sold') {
-          totalRealizedProfit += profit;
+          totalStockValue += (item.price || 0);
         }
 
         let statusBadge = '<span class="badge-status st-online">En ligne</span>';
@@ -270,10 +299,17 @@
 
         return `
           <tr>
-            <td><strong>${item.title}</strong></td>
+            <td>
+              <div class="item-cell">
+                <img src="${item.image_url || 'https://via.placeholder.com/40'}" class="item-img" alt="" />
+                <strong>${item.title}</strong>
+              </div>
+            </td>
             <td style="color:var(--subtext);">${item.published_at || '—'}</td>
             <td><input type="number" value="${cost}" step="0.5" onchange="updateCost('${id}', this.value)" /></td>
-            <td><input type="number" value="${salePrice}" step="0.5" onchange="updateSalePrice('${id}', this.value)" /></td>
+            <td>
+              <input type="number" value="${salePrice.toFixed(2)}" step="0.5" disabled />
+            </td>
             <td style="color:${profit >= 0 ? 'var(--accent)' : 'var(--sold)'}; font-weight:bold;">
               ${profit >= 0 ? '+' : ''}${profit.toFixed(2)} €
             </td>
@@ -283,10 +319,13 @@
         `;
       }).join('');
 
+      const profitElem = document.getElementById('total-profit');
+      profitElem.innerText = (totalProfit >= 0 ? "+" : "") + totalProfit.toFixed(2) + " €";
+      profitElem.className = "val " + (totalProfit >= 0 ? "green" : "red");
+
       document.getElementById('total-items').innerText = onlineCount;
       document.getElementById('total-value').innerText = totalStockValue.toFixed(2) + " €";
       document.getElementById('total-cost').innerText = totalCost.toFixed(2) + " €";
-      document.getElementById('total-profit').innerText = (totalRealizedProfit >= 0 ? "+" : "") + totalRealizedProfit.toFixed(2) + " €";
     }
 
     function confirmSale(id) {
@@ -298,6 +337,7 @@
     }
 
     function cancelSale(id) {
+      userStore[id].salePrice = 0.00;
       userStore[id].status = 'removed';
       saveStore();
       initDashboard();
@@ -305,12 +345,6 @@
 
     function updateCost(id, val) {
       userStore[id].cost = parseFloat(val) || 0;
-      saveStore();
-      initDashboard();
-    }
-
-    function updateSalePrice(id, val) {
-      userStore[id].salePrice = parseFloat(val) || 0;
       saveStore();
       initDashboard();
     }
