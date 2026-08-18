@@ -668,6 +668,9 @@
         if (meta.status === 'sold') statusBadge = '<span class="badge-status st-sold">VENDU</span>';
         if (meta.status === 'removed') statusBadge = '<span class="badge-status st-removed">À REPUBLIER</span>';
 
+        // Utilisation de la taille récupérée depuis item.size ou item.subtitle, sinon valeur par défaut
+        const sizeText = item.size || item.subtitle || 'Taille L';
+
         return `
           <tr>
             <td>
@@ -675,7 +678,7 @@
                 <img src="${item.image_url}" class="item-img" onerror="this.src='https://via.placeholder.com/44?text=Vinted'" />
                 <div class="item-info-text">
                   <span class="item-title">${item.title}</span>
-                  <span class="item-subtitle">${item.subtitle || 'Taille standard'}</span>
+                  <span class="item-subtitle">${sizeText}</span>
                 </div>
               </div>
             </td>
