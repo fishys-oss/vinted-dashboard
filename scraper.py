@@ -1,20 +1,18 @@
 import json
-import re
 from datetime import datetime
-from bs4 import BeautifulSoup
 import requests
 
 USER_ID = "249331091"
 
+# Headers reproduisant un vrai navigateur
 headers = {
     "User-Agent": (
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML,"
         " like Gecko) Chrome/122.0.0.0 Safari/537.36"
     ),
-    "Accept": (
-        "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8"
-    ),
+    "Accept": "application/json, text/plain, */*",
     "Accept-Language": "fr-FR,fr;q=0.9,en-US;q=0.8,en;q=0.7",
+    "Referer": f"https://www.vinted.fr/member/{USER_ID}",
 }
 
 
@@ -22,75 +20,54 @@ def get_vinted_items():
   session = requests.Session()
   session.headers.update(headers)
 
-  profile_url = f"https://www.vinted.fr/member/{USER_ID}"
-  print(f"Chargement de la page profil : {profile_url}...")
-
   try:
-    res = session.get(profile_url, timeout=15)
+    # Step 1 : Initialisation des cookies de session
+    print("Initialisation de la session Vinted...")
+    init_res = session.get("https://www.vinted.fr", timeout=15)
 
-    if res.status_code != 200:
-      print(f"❌ Code erreur Vinted : {res.status_code}")
-      return
+    # Step 2 : Récupération des articles via la route API des membres
+    api_url = f"https://www.vinted.fr/api/v2/users/{USER_ID}/items?page=1&per_page=20"
+    print(f"Interrogation de l'API : {api_url}")
 
-    soup = BeautifulSoup(res.text, "html.parser")
-    formatted_items = []
+    res = session.get(api_url, timeout=15)
 
-    # Recherche des éléments d'articles dans le DOM HTML
-    item_cards = soup.select(
-        ".feed-grid__item, [data-testid='grid-item'], .web_ui__ItemBox__box"
-    )
+    if res.status_code == 200:
+      data = res.json()
+      items_data = data.get("items", [])
 
-    for card in item_cards:
-      # Titre
-      title_elem = card.select_one(
-          ".item-box__title, [data-testid*='title'], .web_ui__ItemBox__title"
-      )
-      title = (
-          title_elem.text.strip() if title_elem else "Article sans titre"
-      )
+      formatted_items = []
+      for item in items_data:
+        # Traitement du prix (structure objet ou valeur simple)
+        price_val = item.get("price")
+        if isinstance(price_val, dict):
+          price = float(price_val.get("amount", 0))
+        elif isinstance(price_val, (int, float, str)):
+          price = float(price_val)
+        else:
+          price = 0.0
 
-      # Prix
-      price_elem = card.select_one(
-          ".item-box__price, [data-testid*='price'], .web_ui__ItemBox__price"
-      )
-      price = 0.0
-      if price_elem:
-        price_text = (
-            price_elem.text.replace("€", "").replace(",", ".").strip()
-        )
-        match = re.search(r"\d+(\.\d+)?", price_text)
-        if match:
-          price = float(match.group())
+        formatted_items.append({
+            "id": str(item.get("id")),
+            "title": item.get("title", "Article Vinted"),
+            "price": price,
+            "url": item.get("url", ""),
+            "scraped_at": datetime.now().isoformat(),
+        })
 
-      # Lien
-      link_elem = card.select_one("a[href*='/items/']")
-      url = profile_url
-      if link_elem and "href" in link_elem.attrs:
-        href = link_elem["href"]
-        url = href if href.startswith("http") else f"https://www.vinted.fr{href}"
+      # Écriture dans le fichier JSON
+      with open("data.json", "w", encoding="utf-8") as f:
+        json.dump(formatted_items, f, indent=2, ensure_ascii=False)
 
-      # ID unique basé sur l'URL ou le hash
-      item_id = (
-          url.split("/items/")[1].split("-")[0]
-          if "/items/" in url
-          else str(hash(title + str(price)))
-      )
+      print(f"✅ {len(formatted_items)} articles enregistrés dans data.json")
 
-      formatted_items.append({
-          "id": item_id,
-          "title": title,
-          "price": price,
-          "url": url,
-          "scraped_at": datetime.now().isoformat(),
-      })
-
-    with open("data.json", "w", encoding="utf-8") as f:
-      json.dump(formatted_items, f, indent=2, ensure_ascii=False)
-
-    print(f"✅ {len(formatted_items)} articles enregistrés dans data.json")
+    else:
+      print(f"❌ Erreur API Vinted (Statut {res.status_code})")
+      # Si échec, écriture d'un fichier vide pour éviter de casser le pipeline
+      with open("data.json", "w", encoding="utf-8") as f:
+        json.dump([], f)
 
   except Exception as e:
-    print(f"❌ Erreur lors du scraping : {e}")
+    print(f"❌ Erreur d'exécution : {e}")
 
 
 if __name__ == "__main__":
