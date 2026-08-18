@@ -265,20 +265,37 @@
       font-size: 0.7rem;
       font-weight: 700;
       text-transform: uppercase;
-      padding: 1rem;
+      padding: 1.1rem 1rem;
       border-bottom: 1px solid var(--card-border);
+      letter-spacing: 0.5px;
     }
-    td { padding: 0.85rem 1rem; font-size: 0.875rem; border-bottom: 1px solid var(--card-border); }
+    td { padding: 1rem; font-size: 0.875rem; border-bottom: 1px solid var(--card-border); vertical-align: middle; }
 
     .item-cell { display: flex; align-items: center; gap: 0.75rem; }
 
     .item-img {
-      width: 42px;
-      height: 42px;
-      border-radius: 6px;
+      width: 44px;
+      height: 44px;
+      border-radius: 8px;
       object-fit: cover;
       background: #1e293b;
       border: 1px solid var(--card-border);
+    }
+
+    .item-info-text {
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+    }
+
+    .item-title {
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .item-subtitle {
+      font-size: 0.75rem;
+      color: var(--subtext);
     }
 
     input[type="number"] {
@@ -296,18 +313,51 @@
       background: #1e293b;
     }
 
+    /* Status badges inspirés de l'image */
     .badge-status {
+      padding: 0.3rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      display: inline-block;
+      letter-spacing: 0.5px;
+    }
+
+    .st-recent { background: rgba(59, 130, 246, 0.12); border: 1px solid rgba(59, 130, 246, 0.3); color: var(--blue); }
+    .st-online { background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.3); color: var(--accent); }
+    .st-warning { background: rgba(245, 158, 11, 0.12); border: 1px solid rgba(245, 158, 11, 0.3); color: var(--warning); }
+    .st-sold { background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.3); color: var(--accent); }
+    .st-removed { background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.3); color: var(--sold); }
+
+    .roi-badge {
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      color: var(--accent);
       padding: 0.25rem 0.6rem;
-      border-radius: 9999px;
+      border-radius: 20px;
       font-size: 0.75rem;
       font-weight: 600;
       display: inline-block;
     }
 
-    .st-online { background: rgba(16, 185, 129, 0.15); color: var(--accent); }
-    .st-pending { background: rgba(245, 158, 11, 0.15); color: var(--warning); }
-    .st-sold { background: rgba(16, 185, 129, 0.15); color: var(--accent); }
-    .st-removed { background: rgba(239, 68, 68, 0.15); color: var(--sold); }
+    .btn-vinted {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      color: var(--text);
+      padding: 0.35rem 0.75rem;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      transition: background 0.2s;
+    }
+
+    .btn-vinted:hover {
+      background: var(--card-border);
+    }
 
     /* Calculator View */
     .calc-box {
@@ -403,16 +453,17 @@
         <thead>
           <tr>
             <th>Article</th>
-            <th>Date Pub.</th>
-            <th>Achat (€)</th>
-            <th>Vente (€)</th>
-            <th>Bénéfice</th>
-            <th>Statut</th>
+            <th>Prix Achat</th>
+            <th>Prix Vente</th>
+            <th>Bénéfice Net</th>
+            <th>ROI %</th>
+            <th>Date Ligne</th>
+            <th>Statut / Agence</th>
             <th>Lien</th>
           </tr>
         </thead>
         <tbody id="items-list">
-          <tr><td colspan="7" style="text-align:center;">Chargement...</td></tr>
+          <tr><td colspan="8" style="text-align:center;">Chargement...</td></tr>
         </tbody>
       </table>
     </div>
@@ -453,7 +504,7 @@
 
       <div class="calc-res">
         <div>
-          <label>Bénéfice Estimmé</label>
+          <label>Bénéfice Estimé</label>
           <div class="val green" id="calc-profit-val">10.00 €</div>
         </div>
         <div>
@@ -534,7 +585,7 @@
         list.innerHTML = notifs.map(item => `
           <div class="notif-item">
             <div class="notif-info">
-              <img src="${item.image_url}" class="item-img" onerror="this.src='https://via.placeholder.com/42?text=Vinted'" />
+              <img src="${item.image_url}" class="item-img" onerror="this.src='https://via.placeholder.com/44?text=Vinted'" />
               <span><strong>${item.title}</strong> n'est plus en ligne. A-t-il été vendu ?</span>
             </div>
             <div class="notif-actions">
@@ -593,44 +644,52 @@
         const meta = userStore[id] || { cost: 1.00, salePrice: 0.00, status: 'online' };
 
         const cost = parseFloat(meta.cost) || 0;
-        const salePrice = meta.status === 'sold' ? (parseFloat(meta.salePrice) || 0) : 0.00;
-        const profit = salePrice - cost;
+        // On prend le prix affiché dans data.json ou le prix de vente si vendu
+        const currentPrice = meta.status === 'sold' ? (parseFloat(meta.salePrice) || 0) : (item.price || 0);
+        const profit = meta.status === 'sold' ? (currentPrice - cost) : ((item.price || 0) - cost);
+        const roi = cost > 0 ? ((profit / cost) * 100) : 0;
 
         totalCost += cost;
-        totalProfit += profit;
+        if (meta.status === 'sold') {
+          totalProfit += profit;
+          soldCount++;
+          totalSoldProfit += profit;
+          totalSoldCost += cost;
+        } else {
+          totalProfit += profit;
+        }
 
         if (meta.status === 'online') {
           onlineCount++;
           totalStockValue += (item.price || 0);
         }
 
-        if (meta.status === 'sold') {
-          soldCount++;
-          totalSoldProfit += profit;
-          totalSoldCost += cost;
-        }
-
-        let statusBadge = '<span class="badge-status st-online">En ligne</span>';
-        if (meta.status === 'pending') statusBadge = '<span class="badge-status st-pending">En attente</span>';
-        if (meta.status === 'sold') statusBadge = '<span class="badge-status st-sold">Vendu</span>';
-        if (meta.status === 'removed') statusBadge = '<span class="badge-status st-removed">Retiré</span>';
+        // Gestion dynamique des badges de statut visuels
+        let statusBadge = '<span class="badge-status st-online">ACTIF</span>';
+        if (meta.status === 'pending') statusBadge = '<span class="badge-status st-warning">⚠️ EN ATTENTE</span>';
+        if (meta.status === 'sold') statusBadge = '<span class="badge-status st-sold">VENDU</span>';
+        if (meta.status === 'removed') statusBadge = '<span class="badge-status st-removed">À REPUBLIER</span>';
 
         return `
           <tr>
             <td>
               <div class="item-cell">
-                <img src="${item.image_url}" class="item-img" onerror="this.src='https://via.placeholder.com/42?text=Vinted'" />
-                <strong>${item.title}</strong>
+                <img src="${item.image_url}" class="item-img" onerror="this.src='https://via.placeholder.com/44?text=Vinted'" />
+                <div class="item-info-text">
+                  <span class="item-title">${item.title}</span>
+                  <span class="item-subtitle">${item.subtitle || 'Taille standard'}</span>
+                </div>
               </div>
             </td>
-            <td style="color:var(--subtext);">${item.published_at || '—'}</td>
-            <td><input type="number" value="${cost}" step="0.5" onchange="updateCost('${id}', this.value)" /></td>
-            <td><input type="number" value="${salePrice.toFixed(2)}" step="0.5" disabled /></td>
+            <td><input type="number" value="${cost.toFixed(2)}" step="0.5" onchange="updateCost('${id}', this.value)" /></td>
+            <td><strong>${currentPrice.toFixed(2)} €</strong></td>
             <td style="color:${profit >= 0 ? 'var(--accent)' : 'var(--sold)'}; font-weight:bold;">
               ${profit >= 0 ? '+' : ''}${profit.toFixed(2)} €
             </td>
+            <td><span class="roi-badge">+${roi.toFixed(0)}%</span></td>
+            <td style="color:var(--subtext); font-size: 0.8rem;">${item.published_at || 'Aujourd\'hui'}</td>
             <td>${statusBadge}</td>
-            <td><a href="${item.url}" target="_blank" style="color:var(--subtext);">Lien ↗</a></td>
+            <td><a href="${item.url}" target="_blank" class="btn-vinted">↗ Vinted</a></td>
           </tr>
         `;
       }).join('');
@@ -672,8 +731,8 @@
           <tr>
             <td>
               <div class="item-cell">
-                <img src="${item.image_url}" class="item-img" onerror="this.src='https://via.placeholder.com/42?text=Vinted'" />
-                <strong>${item.title}</strong>
+                <img src="${item.image_url}" class="item-img" onerror="this.src='https://via.placeholder.com/44?text=Vinted'" />
+                <span class="item-title">${item.title}</span>
               </div>
             </td>
             <td>${cost.toFixed(2)} €</td>
