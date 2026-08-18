@@ -11,7 +11,6 @@ headers = {
     ),
     "Accept": "application/json, text/plain, */*",
     "Accept-Language": "fr-FR,fr;q=0.9,en-US;q=0.8,en;q=0.7",
-    "Referer": f"https://www.vinted.fr/member/{USER_ID}",
 }
 
 
@@ -20,21 +19,20 @@ def get_vinted_items():
   session.headers.update(headers)
 
   try:
-    # 1. Visite du profil pour récupérer les cookies de session Vinted
     print(f"Initialisation de la session pour l'utilisateur {USER_ID}...")
-    session.get(f"https://www.vinted.fr/member/{USER_ID}", timeout=15)
+    # 1. Requête sur la page d'accueil pour récupérer le cookie de session et les headers anonymes
+    init_res = session.get("https://www.vinted.fr", timeout=15)
 
-    # 2. Test de la route API Wardrobe (Dressing)
-    api_url = f"https://www.vinted.fr/api/v2/users/{USER_ID}/wardrobe?page=1&per_page=20"
-    print(f"Extraction des articles via : {api_url}")
+    # Récupération du jeton d'accès anonyme si présent dans les cookies
+    anon_token = session.cookies.get("access_token_web")
+    if anon_token:
+      session.headers.update({"Authorization": f"Bearer {anon_token}"})
+
+    # 2. Endpoint exact des articles du membre
+    api_url = f"https://www.vinted.fr/api/v2/users/{USER_ID}/items?page=1&per_page=20"
+    print(f"Extraction ciblée du dressing via : {api_url}")
 
     res = session.get(api_url, timeout=15)
-
-    # 3. Fallback sur le catalogue si la route wardrobe échoue
-    if res.status_code == 404:
-      print("Route /wardrobe introuvable, essai via /catalog/items...")
-      api_url = f"https://www.vinted.fr/api/v2/catalog/items?user_id={USER_ID}&per_page=20"
-      res = session.get(api_url, timeout=15)
 
     if res.status_code == 200:
       data = res.json()
@@ -42,7 +40,7 @@ def get_vinted_items():
 
       formatted_items = []
       for item in items_data:
-        # Traitement du prix (objet ou valeur brute)
+        # Formatage du prix
         price_val = item.get("price")
         if isinstance(price_val, dict):
           price = float(price_val.get("amount", 0))
@@ -66,7 +64,7 @@ def get_vinted_items():
       with open("data.json", "w", encoding="utf-8") as f:
         json.dump(formatted_items, f, indent=2, ensure_ascii=False)
 
-      print(f"✅ {len(formatted_items)} articles enregistrés dans data.json")
+      print(f"✅ {len(formatted_items)} de VOS articles ont été enregistrés.")
 
     else:
       print(f"❌ Erreur API Vinted (Statut {res.status_code})")
