@@ -1,0 +1,32 @@
+name: Vinted Auto Scraper
+
+on:
+  schedule:
+    - cron: '*/5 * * * *' # Tourne toutes les 5 minutes
+  workflow_dispatch: # Permet de lancer manuellement
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Récupérer le code
+        uses: actions/checkout@v3
+
+      - name: Installer Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Installer les dépendances
+        run: pip install requests beautifulsoup4
+
+      - name: Lancer le scraper
+        run: python scraper.py
+
+      - name: Enregistrer les données
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add data.json
+          git commit -m "Auto-update stock" || exit 0
+          git push
