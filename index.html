@@ -33,17 +33,39 @@
       margin-bottom: 1.5rem;
     }
 
-    /* Boîte de notifications */
-    .notif-box {
-      background: rgba(245, 158, 11, 0.1);
+    .btn-inbox {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      color: var(--text);
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn-inbox .count {
+      background: var(--warning);
+      color: #000;
+      border-radius: 9999px;
+      padding: 0.1rem 0.4rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+
+    /* Boîte de Réception / Notifications */
+    .inbox-modal {
+      background: rgba(245, 158, 11, 0.08);
       border: 1px solid var(--warning);
       border-radius: 10px;
-      padding: 1rem 1.5rem;
+      padding: 1.25rem;
       margin-bottom: 2rem;
       display: none;
     }
 
-    .notif-title {
+    .inbox-title {
       color: var(--warning);
       font-weight: 700;
       margin-bottom: 0.75rem;
@@ -135,11 +157,11 @@
     }
 
     .item-img {
-      width: 40px;
-      height: 40px;
+      width: 42px;
+      height: 42px;
       border-radius: 6px;
       object-fit: cover;
-      background: #0f172a;
+      background: #1e293b;
       border: 1px solid var(--card-border);
     }
 
@@ -176,12 +198,15 @@
 
   <div class="header">
     <h1>Vinted Business Suite</h1>
+    <button class="btn-inbox" onclick="toggleInbox()">
+      📥 Boîte de réception <span class="count" id="inbox-count">0</span>
+    </button>
   </div>
 
-  <!-- Zone de Notification -->
-  <div id="notif-box" class="notif-box">
-    <div class="notif-title">⚠️ Article(s) ne figurant plus sur Vinted</div>
-    <div id="notif-list"></div>
+  <!-- Zone Boîte de Réception -->
+  <div id="inbox-modal" class="inbox-modal">
+    <div class="inbox-title">📥 Boîte de Réception — Articles à traiter</div>
+    <div id="inbox-list"></div>
   </div>
 
   <div class="stats">
@@ -227,8 +252,8 @@
         const id = item.id;
         if (!userStore[id]) {
           userStore[id] = {
-            cost: 1.00,        // Prix d'achat par défaut
-            salePrice: 0.00,    // Vente bloquée à 0 tant que c'est en ligne
+            cost: 1.00,
+            salePrice: 0.00,
             vintedPrice: item.price,
             status: item.is_pending ? 'pending' : 'online'
           };
@@ -242,34 +267,41 @@
       });
 
       saveStore();
-      renderNotifications(pendingNotifs);
+      updateInboxUI(pendingNotifs);
       renderDashboard(items);
     }
 
-    function renderNotifications(notifs) {
-      const box = document.getElementById('notif-box');
-      const list = document.getElementById('notif-list');
+    function updateInboxUI(notifs) {
+      const countElem = document.getElementById('inbox-count');
+      const modal = document.getElementById('inbox-modal');
+      const list = document.getElementById('inbox-list');
 
-      if (notifs.length === 0) {
-        box.style.display = 'none';
-        return;
+      countElem.innerText = notifs.length;
+
+      if (notifs.length > 0) {
+        modal.style.display = 'block';
+        list.innerHTML = notifs.map(item => `
+          <div class="notif-item">
+            <div class="notif-info">
+              <img src="${item.image_url}" class="item-img" onerror="this.src='https://via.placeholder.com/42?text=Vinted'" />
+              <span><strong>${item.title}</strong> n'est plus en ligne. A-t-il été vendu ?</span>
+            </div>
+            <div class="notif-actions">
+              <span>Prix Vendu (€) :</span>
+              <input type="number" id="real-price-${item.id}" value="${item.vintedPrice || 0}" step="0.5" />
+              <button class="btn btn-confirm" onclick="confirmSale('${item.id}')">Oui, Vendu</button>
+              <button class="btn btn-cancel" onclick="cancelSale('${item.id}')">Non, Supprimé</button>
+            </div>
+          </div>
+        `).join('');
+      } else {
+        list.innerHTML = '<p style="color:var(--subtext); font-size:0.85rem;">Aucune notification. Vos ventes apparaîtront ici quand un article quittera Vinted.</p>';
       }
+    }
 
-      box.style.display = 'block';
-      list.innerHTML = notifs.map(item => `
-        <div class="notif-item">
-          <div class="notif-info">
-            <img src="${item.image_url || 'https://via.placeholder.com/40'}" class="item-img" alt="" />
-            <span><strong>${item.title}</strong> n'est plus en ligne. A-t-il été vendu ?</span>
-          </div>
-          <div class="notif-actions">
-            <span>Prix Vendu (€) :</span>
-            <input type="number" id="real-price-${item.id}" value="${item.vintedPrice || 0}" step="0.5" />
-            <button class="btn btn-confirm" onclick="confirmSale('${item.id}')">Oui, Vendu</button>
-            <button class="btn btn-cancel" onclick="cancelSale('${item.id}')">Non, Supprimé</button>
-          </div>
-        </div>
-      `).join('');
+    function toggleInbox() {
+      const modal = document.getElementById('inbox-modal');
+      modal.style.display = modal.style.display === 'block' ? 'none' : 'block';
     }
 
     function renderDashboard(items) {
@@ -301,15 +333,13 @@
           <tr>
             <td>
               <div class="item-cell">
-                <img src="${item.image_url || 'https://via.placeholder.com/40'}" class="item-img" alt="" />
+                <img src="${item.image_url}" class="item-img" onerror="this.src='https://via.placeholder.com/42?text=Vinted'" />
                 <strong>${item.title}</strong>
               </div>
             </td>
             <td style="color:var(--subtext);">${item.published_at || '—'}</td>
             <td><input type="number" value="${cost}" step="0.5" onchange="updateCost('${id}', this.value)" /></td>
-            <td>
-              <input type="number" value="${salePrice.toFixed(2)}" step="0.5" disabled />
-            </td>
+            <td><input type="number" value="${salePrice.toFixed(2)}" step="0.5" disabled /></td>
             <td style="color:${profit >= 0 ? 'var(--accent)' : 'var(--sold)'}; font-weight:bold;">
               ${profit >= 0 ? '+' : ''}${profit.toFixed(2)} €
             </td>
