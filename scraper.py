@@ -28,6 +28,7 @@ def get_vinted_items():
     context = browser.new_context(
         user_agent=(
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+            " (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
         ),
         locale="fr-FR",
     )
@@ -35,6 +36,8 @@ def get_vinted_items():
 
     try:
       page.goto(profile_url, wait_until="domcontentloaded", timeout=30000)
+      # Scroll vers le bas pour forcer le chargement de toutes les images
+      page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
       page.wait_for_timeout(3000)
 
       soup = BeautifulSoup(page.content(), "html.parser")
@@ -77,12 +80,13 @@ def get_vinted_items():
                 href if href.startswith("http") else f"https://www.vinted.fr{href}"
             )
 
-          # Récupération de l'image miniature
+          # Extraction propre de l'image (anti-lazy loading)
           img_url = ""
           if img_elem:
             img_url = (
                 img_elem.get("src")
                 or img_elem.get("data-src")
+                or img_elem.get("data-srcset", "").split(" ")[0]
                 or img_elem.get("srcset", "").split(" ")[0]
             )
 
@@ -91,9 +95,15 @@ def get_vinted_items():
               if "/items/" in url
               else str(hash(title + str(price)))
           )
-          published_at = previous_items.get(item_id, {}).get(
-              "published_at", datetime.now().strftime("%Y-%m-%d")
-          )
+
+          # Date fixe de 1re détection
+          published_at = previous_items.get(item_id, {}).get("published_at")
+          if not published_at:
+            published_at = datetime.now().strftime("%d/%m/%Y")
+
+          # Image conservée si l'extraction échoue
+          if not img_url and item_id in previous_items:
+            img_url = previous_items[item_id].get("image_url", "")
 
           current_items[item_id] = {
               "id": item_id,
