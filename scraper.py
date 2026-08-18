@@ -1,21 +1,33 @@
 import json
+import os
 from datetime import datetime
 from bs4 import BeautifulSoup
 from playwright.sync_api import sync_playwright
 
 USER_ID = "249331091"
+DATA_FILE = "data.json"
+
+
+def load_previous_data():
+  if os.path.exists(DATA_FILE):
+    try:
+      with open(DATA_FILE, "r", encoding="utf-8") as f:
+        return {item["id"]: item for item in json.load(f)}
+    except Exception as e:
+      print(f"Erreur chargement ancien data.json: {e}")
+  return {}
 
 
 def get_vinted_items():
+  previous_items = load_previous_data()
   profile_url = f"https://www.vinted.fr/member/{USER_ID}"
-  print(f"Lancement du navigateur vers : {profile_url}...")
+  current_items = {}
 
   with sync_playwright() as p:
     browser = p.chromium.launch(headless=True)
     context = browser.new_context(
         user_agent=(
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
-            " (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
         ),
         locale="fr-FR",
     )
@@ -23,14 +35,9 @@ def get_vinted_items():
 
     try:
       page.goto(profile_url, wait_until="domcontentloaded", timeout=30000)
-      page.wait_for_timeout(3000)  # Pause pour laisser charger le JS React
+      page.wait_for_timeout(3000)
 
-      content = page.content()
-      soup = BeautifulSoup(content, "html.parser")
-
-      formatted_items = []
-
-      # Recherche des cartes d'articles dans la grille du profil
+      soup = BeautifulSoup(page.content(), "html.parser")
       cards = soup.select(
           ".feed-grid__item, [data-testid*='grid-item'],"
           " .web_ui__ItemBox__box, .item-box"
@@ -52,7 +59,6 @@ def get_vinted_items():
               price_elem.text.replace("€", "").replace(",", ".").strip()
           )
           try:
-            # Extraction des chiffres du prix
             import re
 
             match = re.search(r"\d+(\.\d+)?", price_text)
@@ -63,7 +69,6 @@ def get_vinted_items():
           title = (
               title_elem.text.strip() if title_elem else "Article Vinted"
           )
-
           url = profile_url
           if link_elem and "href" in link_elem.attrs:
             href = link_elem["href"]
@@ -77,23 +82,44 @@ def get_vinted_items():
               else str(hash(title + str(price)))
           )
 
-          formatted_items.append({
+          # Date d'origine conservée si déjà présent, sinon date du jour
+          published_at = previous_items.get(item_id, {}).get(
+              "published_at", datetime.now().strftime("%Y-%m-%d")
+          )
+
+          current_items[item_id] = {
               "id": item_id,
               "title": title,
               "price": price,
               "url": url,
-              "scraped_at": datetime.now().isoformat(),
-          })
-
-      print(f"✅ {len(formatted_items)} de VOS articles enregistrés.")
-
-      with open("data.json", "w", encoding="utf-8") as f:
-        json.dump(formatted_items, f, indent=2, ensure_ascii=False)
+              "published_at": published_at,
+              "is_sold": False,
+              "is_pending": False,
+          }
 
     except Exception as e:
-      print(f"❌ Erreur Playwright : {e}")
+      print(f"Erreur scraping: {e}")
     finally:
       browser.close()
+
+  final_items = []
+
+  # Articles toujours en ligne
+  for item_id, item in current_items.items():
+    final_items.append(item)
+
+  # Détection des ventes/retraits
+  for item_id, prev_item in previous_items.items():
+    if item_id not in current_items:
+      # Si l'article n'était pas déjà marqué vendu/retiré, il passe en attente
+      if not prev_item.get("is_sold", False) and not prev_item.get(
+          "is_removed", False
+      ):
+        prev_item["is_pending"] = True
+      final_items.append(prev_item)
+
+  with open(DATA_FILE, "w", encoding="utf-8") as f:
+    json.dump(final_items, f, indent=2, ensure_ascii=False)
 
 
 if __name__ == "__main__":
