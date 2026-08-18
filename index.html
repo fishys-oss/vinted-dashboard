@@ -34,6 +34,60 @@
       margin-bottom: 1.5rem;
     }
 
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    /* Timer Badge Dark SaaS */
+    .sync-timer-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      color: var(--accent);
+      padding: 0.4rem 0.8rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    .pulse-dot {
+      width: 6px;
+      height: 6px;
+      background-color: var(--accent);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--accent);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+      70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    }
+
+    .btn-refresh {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      color: var(--text);
+      padding: 0.5rem 0.8rem;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.85rem;
+      transition: background 0.2s;
+    }
+
+    .btn-refresh:hover {
+      background: var(--card-border);
+    }
+
     .header-actions {
       display: flex;
       gap: 0.75rem;
@@ -292,8 +346,15 @@
 <body>
 
   <div class="header">
-    <h1>Vinted Business Suite</h1>
+    <div class="header-left">
+      <h1>Vinted Business Suite</h1>
+      <div class="sync-timer-badge" title="Prochaine exécution GitHub Actions">
+        <span class="pulse-dot"></span>
+        <span>Synchro dans : <strong id="next-sync-timer">--m --s</strong></span>
+      </div>
+    </div>
     <div class="header-actions">
+      <button class="btn-refresh" onclick="manualRefresh()">🔄 Rafraîchir</button>
       <button class="btn-export" onclick="exportCSV()">📥 Exporter CSV</button>
       <button class="btn-inbox" onclick="toggleInbox()">
         📥 Boîte de réception <span class="count" id="inbox-count">0</span>
@@ -671,6 +732,33 @@
       saveStore();
       initDashboard();
     }
+
+    function updateSyncTimer() {
+      const now = new Date();
+      const nextSync = new Date(now);
+      nextSync.setHours(now.getHours() + 1, 0, 0, 0);
+
+      const diffMs = nextSync - now;
+      const totalSeconds = Math.floor(diffMs / 1000);
+
+      const minutes = Math.floor(totalSeconds / 60);
+      const seconds = totalSeconds % 60;
+
+      const formattedMinutes = String(minutes).padStart(2, '0');
+      const formattedSeconds = String(seconds).padStart(2, '0');
+
+      const timerElement = document.getElementById('next-sync-timer');
+      if (timerElement) {
+        timerElement.textContent = `${formattedMinutes}m ${formattedSeconds}s`;
+      }
+    }
+
+    function manualRefresh() {
+      initDashboard();
+    }
+
+    updateSyncTimer();
+    setInterval(updateSyncTimer, 1000);
 
     initDashboard();
   </script>
