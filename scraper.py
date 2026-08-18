@@ -1,5 +1,6 @@
 import json
 import os
+import re
 from datetime import datetime
 from bs4 import BeautifulSoup
 from playwright.sync_api import sync_playwright
@@ -24,21 +25,32 @@ def get_vinted_items():
   current_items = {}
 
   with sync_playwright() as p:
-    browser = p.chromium.launch(headless=True)
+    # Lancement rapide du navigateur
+    browser = p.chromium.launch(
+        headless=True,
+        args=["--no-sandbox", "--disable-setuid-sandbox"],
+    )
+
     context = browser.new_context(
         user_agent=(
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
             " (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
         ),
         locale="fr-FR",
+        viewport={"width": 1280, "height": 800},
     )
     page = context.new_page()
 
+    # Bloquer les images et CSS superflus pour gagner du temps
+    page.route(
+        "**/*.{png,jpg,jpeg,svg,webp,css,woff,woff2}",
+        lambda route: route.abort(),
+    )
+
     try:
-      page.goto(profile_url, wait_until="domcontentloaded", timeout=30000)
-      # Scroll vers le bas pour forcer le chargement de toutes les images
-      page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
-      page.wait_for_timeout(3000)
+      # Max 15s de chargement
+      page.goto(profile_url, wait_until="commit", timeout=15000)
+      page.wait_for_selector(".feed-grid__item, .item-box", timeout=10000)
 
       soup = BeautifulSoup(page.content(), "html.parser")
       cards = soup.select(
@@ -62,13 +74,8 @@ def get_vinted_items():
           price_text = (
               price_elem.text.replace("€", "").replace(",", ".").strip()
           )
-          try:
-            import re
-
-            match = re.search(r"\d+(\.\d+)?", price_text)
-            price = float(match.group()) if match else 0.0
-          except Exception:
-            price = 0.0
+          match = re.search(r"\d+(\.\d+)?", price_text)
+          price = float(match.group()) if match else 0.0
 
           title = (
               title_elem.text.strip() if title_elem else "Article Vinted"
@@ -80,7 +87,6 @@ def get_vinted_items():
                 href if href.startswith("http") else f"https://www.vinted.fr{href}"
             )
 
-          # Extraction propre de l'image (anti-lazy loading)
           img_url = ""
           if img_elem:
             img_url = (
@@ -96,12 +102,10 @@ def get_vinted_items():
               else str(hash(title + str(price)))
           )
 
-          # Date fixe de 1re détection
           published_at = previous_items.get(item_id, {}).get("published_at")
           if not published_at:
             published_at = datetime.now().strftime("%d/%m/%Y")
 
-          # Image conservée si l'extraction échoue
           if not img_url and item_id in previous_items:
             img_url = previous_items[item_id].get("image_url", "")
 
