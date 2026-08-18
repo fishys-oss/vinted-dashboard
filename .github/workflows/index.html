@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Vinted Business Dashboard</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: #0d0e11;
+      color: #e0e6ed;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      padding: 30px;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      border-bottom: 1px solid #1a1d24;
+      padding-bottom: 16px;
+    }
+    h1 { font-size: 22px; color: #fff; font-weight: 700; }
+    .badge-live {
+      background: rgba(86, 211, 100, 0.1);
+      color: #56d364;
+      border: 1px solid rgba(86, 211, 100, 0.25);
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .table-container {
+      background: #14171f;
+      border: 1px solid #202532;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+    table { width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; }
+    th {
+      background: #191d28;
+      color: #8b949e;
+      padding: 14px 16px;
+      font-weight: 600;
+      border-bottom: 1px solid #202532;
+      text-transform: uppercase;
+      font-size: 11px;
+    }
+    td { padding: 14px 16px; border-bottom: 1px solid #181c26; color: #c9d1d9; }
+    tr:hover { background: #181c27; }
+    a.btn-vinted {
+      color: #79c0ff;
+      background: rgba(121, 192, 255, 0.1);
+      padding: 4px 10px;
+      border-radius: 6px;
+      text-decoration: none;
+      font-size: 12px;
+    }
+    .badge-expired {
+      background: rgba(255, 123, 114, 0.12);
+      color: #ff7b72;
+      border: 1px solid rgba(255, 123, 114, 0.25);
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .profit { color: #56d364; font-weight: 600; }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div>
+      <h1>Vinted Business Dashboard</h1>
+      <p style="color: #8b949e; font-size: 13px; margin-top: 4px;">Suivi du stock & rentabilité en temps réel</p>
+    </div>
+    <span class="badge-live">● Cloud Sync Active (5m)</span>
+  </div>
+
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>Article</th>
+          <th>Prix Vente</th>
+          <th>Prix Achat Est.</th>
+          <th>Profit</th>
+          <th>Statut</th>
+          <th>Lien Vinted</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+  </div>
+
+  <script>
+    async function loadData() {
+      try {
+        const res = await fetch('data.json?t=' + new Date().getTime());
+        const items = await res.json();
+        const tbody = document.getElementById('tableBody');
+
+        tbody.innerHTML = items.map(item => {
+          const buyPrice = (item.price * 0.5).toFixed(2);
+          const profit = (item.price - buyPrice).toFixed(2);
+
+          return `
+            <tr>
+              <td><strong>${item.title}</strong></td>
+              <td>${item.price.toFixed(2)} €</td>
+              <td style="color:#8b949e;">${buyPrice} €</td>
+              <td class="profit">+${profit} €</td>
+              <td><span class="badge-expired">> 1 Semaine</span></td>
+              <td><a href="${item.url}" target="_blank" class="btn-vinted">Voir produit ↗</a></td>
+            </tr>
+          `;
+        }).join('');
+      } catch (err) {
+        console.log("Chargement des données...");
+      }
+    }
+
+    loadData();
+    setInterval(loadData, 15000);
+  </script>
+</body>
+</html>
