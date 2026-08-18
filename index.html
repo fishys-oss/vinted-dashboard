@@ -55,7 +55,6 @@
       font-weight: 700;
     }
 
-    /* Boîte de Réception / Notifications */
     .inbox-modal {
       background: rgba(245, 158, 11, 0.08);
       border: 1px solid var(--warning);
@@ -65,10 +64,16 @@
       display: none;
     }
 
+    .inbox-header-flex {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.75rem;
+    }
+
     .inbox-title {
       color: var(--warning);
       font-weight: 700;
-      margin-bottom: 0.75rem;
     }
 
     .notif-item {
@@ -105,6 +110,7 @@
 
     .btn-confirm { background: var(--accent); color: white; }
     .btn-cancel { background: #334155; color: var(--text); }
+    .btn-reset { background: #d97706; color: white; margin-left: auto; }
 
     .stats {
       display: grid;
@@ -203,9 +209,11 @@
     </button>
   </div>
 
-  <!-- Zone Boîte de Réception -->
   <div id="inbox-modal" class="inbox-modal">
-    <div class="inbox-title">📥 Boîte de Réception — Articles à traiter</div>
+    <div class="inbox-header-flex">
+      <div class="inbox-title">📥 Boîte de Réception — Articles à traiter</div>
+      <button class="btn btn-reset" onclick="resetAllToOnline()">⚡ Tout remettre en ligne</button>
+    </div>
     <div id="inbox-list"></div>
   </div>
 
@@ -250,15 +258,29 @@
 
       items.forEach(item => {
         const id = item.id;
-        if (!userStore[id]) {
-          userStore[id] = {
-            cost: 1.00,
-            salePrice: 0.00,
-            vintedPrice: item.price,
-            status: item.is_pending ? 'pending' : 'online'
-          };
-        } else if (item.is_pending && userStore[id].status === 'online') {
-          userStore[id].status = 'pending';
+        
+        // Si l'article est présent dans le JSON actuel (donc en ligne)
+        if (!item.is_pending) {
+          if (!userStore[id]) {
+            userStore[id] = {
+              cost: 1.00,
+              salePrice: 0.00,
+              vintedPrice: item.price,
+              status: 'online'
+            };
+          } else {
+            // Forcer le statut "online" si l'article est présent dans data.json
+            if (userStore[id].status === 'pending') {
+              userStore[id].status = 'online';
+            }
+          }
+        } else {
+          // L'article n'est plus présent dans la recherche Vinted
+          if (!userStore[id]) {
+            userStore[id] = { cost: 1.00, salePrice: 0.00, vintedPrice: item.price, status: 'pending' };
+          } else if (userStore[id].status === 'online') {
+            userStore[id].status = 'pending';
+          }
         }
 
         if (userStore[id].status === 'pending') {
@@ -295,8 +317,19 @@
           </div>
         `).join('');
       } else {
-        list.innerHTML = '<p style="color:var(--subtext); font-size:0.85rem;">Aucune notification. Vos ventes apparaîtront ici quand un article quittera Vinted.</p>';
+        modal.style.display = 'none';
+        list.innerHTML = '';
       }
+    }
+
+    function resetAllToOnline() {
+      Object.keys(userStore).forEach(id => {
+        if (userStore[id].status === 'pending') {
+          userStore[id].status = 'online';
+        }
+      });
+      saveStore();
+      initDashboard();
     }
 
     function toggleInbox() {
