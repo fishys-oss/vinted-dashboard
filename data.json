@@ -337,7 +337,7 @@
     "image_url": "",
     "published_at": "19/08/2026",
     "is_sold": true,
-    "is_pending": false
+    "is_pending": true
   },
   {
     "id": "9800000020",
