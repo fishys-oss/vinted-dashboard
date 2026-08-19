@@ -20,15 +20,11 @@
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
-    body }
-    });
-</script>
-<!-- FIN DU SYSTEME DE MOT DE PASSE --> {
+    body {
       background-color: var(--bg);
       color: var(--text);
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-family: sans-serif;
       padding: 2rem;
-      -webkit-font-smoothing: antialiased;
     }
 
     .header {
@@ -409,6 +405,46 @@
 </head>
 <body>
 
+  <!-- SYSTEME DE MOT DE PASSE -->
+  <div id="auth-overlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0b0f17; z-index: 999999; display: flex; justify-content: center; align-items: center;">
+      <div style="background: #151c28; border: 1px solid #1e293b; padding: 30px; border-radius: 10px; text-align: center; width: 320px; box-shadow: 0 8px 24px rgba(0,0,0,0.5);">
+          <h3 style="color: #f8fafc; margin-bottom: 15px; font-size: 1.1rem;">Vinted Business Suite</h3>
+          <input type="password" id="password-input" placeholder="Mot de passe" style="padding: 10px; width: 100%; margin-bottom: 10px; box-sizing: border-box; background: #0f172a; border: 1px solid #1e293b; color: #f8fafc; border-radius: 6px; outline: none;">
+          <button onclick="checkPassword()" style="padding: 10px; width: 100%; background: #10b981; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">Se connecter</button>
+          <p id="error-msg" style="color: #ef4444; font-size: 0.8rem; margin-top: 10px; display: none;">Mot de passe incorrect</p>
+      </div>
+  </div>
+
+  <script>
+      const MON_MDP = "MonSuperMotDePasse123"; // CHANGE TON MOT DE PASSE ICI
+
+      if (sessionStorage.getItem("vinted_auth") === "true") {
+          document.getElementById("auth-overlay").style.display = "none";
+      }
+
+      function checkPassword() {
+          const input = document.getElementById("password-input").value;
+          if (input === MON_MDP) {
+              sessionStorage.setItem("vinted_auth", "true");
+              document.getElementById("auth-overlay").style.display = "none";
+          } else {
+              document.getElementById("error-msg").style.display = "block";
+          }
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+          const pwdInput = document.getElementById("password-input");
+          if (pwdInput) {
+              pwdInput.addEventListener("keypress", function(event) {
+                  if (event.key === "Enter") {
+                      checkPassword();
+                  }
+              });
+          }
+      });
+  </script>
+  <!-- FIN SYSTEME DE MOT DE PASSE -->
+
   <div id="toast-container"></div>
 
   <div class="header">
@@ -677,7 +713,6 @@
 
         const cost = parseFloat(meta.cost) || 0;
         
-        // Le prix de vente s'affiche à 0.00 € sauf s'il est vendu (choisi via la notification)
         const currentSalePrice = meta.status === 'sold' ? (parseFloat(meta.salePrice) || 0) : 0.00;
         const profit = meta.status === 'sold' ? (currentSalePrice - cost) : -cost;
         const roi = cost > 0 ? ((profit / cost) * 100) : 0;
@@ -687,7 +722,7 @@
         if (meta.status === 'online') {
           onlineCount++;
           totalStockValue += (item.price || 0);
-          totalProfit += profit; // -cost tant que non vendu
+          totalProfit += profit;
         }
 
         if (meta.status === 'sold') {
