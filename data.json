@@ -40,16 +40,6 @@
     "is_pending": false
   },
   {
-    "id": "9706949631",
-    "title": "Ralph Lauren",
-    "price": 5.0,
-    "url": "https://www.vinted.fr/items/9706949631",
-    "image_url": "https://images1.vinted.net/t/06_00e80_8GJakTNR3u2h4NuC177o1TLo/310x430/1787132621.webp?s=134c641d2bec6da7be2d4d16e609b9b36b5e7816",
-    "published_at": "19/08/2026",
-    "is_sold": false,
-    "is_pending": false
-  },
-  {
     "id": "9706907234",
     "title": "Lee Cooper",
     "price": 4.0,
@@ -158,6 +148,16 @@
     "published_at": "19/08/2026",
     "is_sold": false,
     "is_pending": false
+  },
+  {
+    "id": "9706949631",
+    "title": "Ralph Lauren",
+    "price": 5.0,
+    "url": "https://www.vinted.fr/items/9706949631",
+    "image_url": "https://images1.vinted.net/t/06_00e80_8GJakTNR3u2h4NuC177o1TLo/310x430/1787132621.webp?s=134c641d2bec6da7be2d4d16e609b9b36b5e7816",
+    "published_at": "19/08/2026",
+    "is_sold": false,
+    "is_pending": true
   },
   {
     "id": "9800000001",
