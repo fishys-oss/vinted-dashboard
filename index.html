@@ -435,7 +435,7 @@
               sessionStorage.setItem("vinted_auth", "true");
               if (overlay) {
                   overlay.style.display = "none";
-                  overlay.remove(); // Supprime complètement l'élément de la page
+                  overlay.remove();
               }
           } else {
               if (errorMsg) errorMsg.style.display = "block";
@@ -446,7 +446,7 @@
       document.addEventListener("DOMContentLoaded", () => {
           const pwdInput = document.getElementById("password-input");
           if (pwdInput) {
-              pwdInput.focus(); // Met le curseur direct dans l'input
+              pwdInput.focus();
               pwdInput.addEventListener("keypress", function(event) {
                   if (event.key === "Enter") {
                       checkPassword();
@@ -624,6 +624,12 @@
           }
         }
 
+        // Toujours s'assurer d'avoir les images à jour si on l'a dans rawItems
+        if (item.image_url && item.title) {
+           userStore[id].title = item.title;
+           userStore[id].image_url = item.image_url;
+        }
+
         if (userStore[id].status === 'pending') {
           pendingNotifs.push({ ...item, ...userStore[id] });
         }
@@ -723,7 +729,7 @@
         const id = item.id;
         const meta = userStore[id] || { cost: 1.00, salePrice: 0.00, status: 'online' };
 
-        const cost = parseFloat(meta.cost) || 0;
+        const cost = parseFloat(meta.cost) || 1.00;
         const currentSalePrice = meta.status === 'sold' ? (parseFloat(meta.salePrice) || 0) : 0.00;
         const profit = meta.status === 'sold' ? (currentSalePrice - cost) : -cost;
         const roi = cost > 0 ? ((profit / cost) * 100) : 0;
@@ -775,6 +781,22 @@
         `;
       }).join('');
 
+      // Ajouter aussi les stats des objets VENDUS qui ont été retirés de rawItems par le scraper
+      Object.keys(userStore).forEach(id => {
+         const meta = userStore[id];
+         if (meta.status === 'sold' && !items.find(i => i.id === id)) {
+            const cost = parseFloat(meta.cost) || 1.00;
+            const currentSalePrice = parseFloat(meta.salePrice) || 0;
+            const profit = currentSalePrice - cost;
+
+            totalCost += cost;
+            soldCount++;
+            totalSoldProfit += profit;
+            totalSoldCost += cost;
+            totalProfit += profit;
+         }
+      });
+
       const profitElem = document.getElementById('total-profit');
       profitElem.innerText = (totalProfit >= 0 ? "+" : "") + totalProfit.toFixed(2) + " €";
       profitElem.className = "val " + (totalProfit < 0 ? "red" : "green");
@@ -792,16 +814,21 @@
 
     function renderSalesHistory() {
       const salesBody = document.getElementById('sales-list');
-      const soldItems = rawItems.filter(item => userStore[item.id] && userStore[item.id].status === 'sold');
+      
+      // On récupère tous les IDs des articles qui ont le statut sold dans le userStore, même s'ils ne sont plus dans le data.json
+      const soldItemsIds = Object.keys(userStore).filter(id => userStore[id].status === 'sold');
 
-      if (soldItems.length === 0) {
+      if (soldItemsIds.length === 0) {
         salesBody.innerHTML = `<tr><td colspan="5" style="text-align:center;">Aucune vente enregistrée pour l'instant.</td></tr>`;
         return;
       }
 
-      salesBody.innerHTML = soldItems.map(item => {
-        const meta = userStore[item.id];
-        const cost = parseFloat(meta.cost) || 0;
+      salesBody.innerHTML = soldItemsIds.map(id => {
+        const meta = userStore[id];
+        // On récupère les données de base via data.json ou le stockage en mémoire
+        const item = rawItems.find(i => i.id === id) || { title: meta.title || "Article Vendu", image_url: meta.image_url || "https://via.placeholder.com/44" };
+        
+        const cost = parseFloat(meta.cost) || 1.00;
         const sale = parseFloat(meta.salePrice) || 0;
         const profit = sale - cost;
         const margin = cost > 0 ? ((profit / cost) * 100) : 0;
@@ -838,9 +865,18 @@
     function exportCSV() {
       let csv = "ID,Titre,Prix Vinted,Cout Achat,Prix Vente,Statut,Statut Lien\n";
 
+      // Exporte le stock actif
       rawItems.forEach(item => {
         const meta = userStore[item.id] || {};
-        csv += `"${item.id}","${item.title.replace(/"/g, '""')}",${item.price},${meta.cost || 0},${meta.salePrice || 0},"${meta.status || 'online'}","${item.url}"\n`;
+        csv += `"${item.id}","${item.title.replace(/"/g, '""')}",${item.price},${meta.cost || 1.00},${meta.salePrice || 0},"${meta.status || 'online'}","${item.url}"\n`;
+      });
+      
+      // Exporte les ventes disparues de data.json mais stockées en mémoire
+      Object.keys(userStore).forEach(id => {
+         const meta = userStore[id];
+         if (meta.status === 'sold' && !rawItems.find(i => i.id === id)) {
+            csv += `"${id}","${(meta.title || "Article").replace(/"/g, '""')}","",${meta.cost || 1.00},${meta.salePrice || 0},"${meta.status}",""\n`;
+         }
       });
 
       const blob = new Blob([csv], { type: 'text/csv' });
@@ -853,23 +889,52 @@
 
     function confirmSale(id) {
       const inputVal = document.getElementById(`real-price-${id}`).value;
+      const item = rawItems.find(i => i.id === id);
+
+      if (!userStore[id]) {
+        userStore[id] = { cost: 1.00 };
+      }
+      
       userStore[id].salePrice = parseFloat(inputVal) || 0;
       userStore[id].status = 'sold';
+      
+      // On sauvegarde le titre et l'image pour que ça reste dans l'historique plus tard
+      if (item) {
+        userStore[id].title = item.title;
+        userStore[id].image_url = item.image_url;
+      }
+
       saveStore();
       initDashboard();
       showToast("Vente enregistrée avec succès !");
     }
 
     function cancelSale(id) {
+      const item = rawItems.find(i => i.id === id);
+      
+      if (!userStore[id]) {
+        userStore[id] = { cost: 1.00 };
+      }
+      
       userStore[id].salePrice = 0.00;
       userStore[id].status = 'removed';
+      
+      if (item) {
+        userStore[id].title = item.title;
+        userStore[id].image_url = item.image_url;
+      }
+      
       saveStore();
       initDashboard();
       showToast("Article marqué comme supprimé/à republier.");
     }
 
     function updateCost(id, val) {
-      userStore[id].cost = parseFloat(val) || 0;
+      if (!userStore[id]) {
+        userStore[id] = { cost: parseFloat(val) || 1.00 };
+      } else {
+        userStore[id].cost = parseFloat(val) || 1.00;
+      }
       saveStore();
       applyFilters();
     }
