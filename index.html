@@ -418,17 +418,25 @@
   <script>
       const MON_MDP = "MonSuperMotDePasse123"; // CHANGE TON MOT DE PASSE ICI
 
-      if (sessionStorage.getItem("vinted_auth") === "true") {
-          document.getElementById("auth-overlay").style.display = "none";
-      }
+      window.addEventListener("DOMContentLoaded", () => {
+          if (sessionStorage.getItem("vinted_auth") === "true") {
+              const overlay = document.getElementById("auth-overlay");
+              if (overlay) overlay.style.display = "none";
+          }
+      });
 
       function checkPassword() {
           const input = document.getElementById("password-input").value;
-          if (input === antonin1234resell) {
+          const errorMsg = document.getElementById("error-msg");
+          const overlay = document.getElementById("auth-overlay");
+
+          if (input === MON_MDP) {
               sessionStorage.setItem("vinted_auth", "true");
-              document.getElementById("auth-overlay").style.display = "none";
+              if (overlay) {
+                  overlay.style.display = "none";
+              }
           } else {
-              document.getElementById("error-msg").style.display = "block";
+              if (errorMsg) errorMsg.style.display = "block";
           }
       }
 
