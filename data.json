@@ -207,7 +207,7 @@
     "image_url": "https://images1.vinted.net/t/06_007c1_Tz6btwpv4HMESmq3L84qG5QF/310x430/1787130380.webp?s=51519c05e6db6acb408ddc5a4625f875854ebb21",
     "published_at": "19/08/2026",
     "is_sold": false,
-    "is_pending": true
+    "is_pending": false
   },
   {
     "id": "9688872296",
@@ -217,7 +217,7 @@
     "image_url": "https://images1.vinted.net/t/05_00598_xDKmCPzbRuYmCLvre1BgZSv3/310x430/1786973623.webp?s=eaa29ae7c8827df3776fc75e34c6bc66d53e52bc",
     "published_at": "19/08/2026",
     "is_sold": false,
-    "is_pending": true
+    "is_pending": false
   },
   {
     "id": "9688789337",
@@ -227,7 +227,7 @@
     "image_url": "https://images1.vinted.net/t/06_01acd_cJvtpht9E87VjRAgbLweDWcg/310x430/1786973209.webp?s=b9cfae51c17d8ac16646d4c399a75024085580d0",
     "published_at": "19/08/2026",
     "is_sold": false,
-    "is_pending": true
+    "is_pending": false
   },
   {
     "id": "9688743921",
@@ -237,7 +237,7 @@
     "image_url": "https://images1.vinted.net/t/05_020c3_MGjMq7FfiWev8QXtqAjjKXck/310x430/1786972981.webp?s=dcd3959050c6aa85f65f0e3184aaba223d7ee042",
     "published_at": "19/08/2026",
     "is_sold": false,
-    "is_pending": true
+    "is_pending": false
   },
   {
     "id": "9688687963",
@@ -247,7 +247,7 @@
     "image_url": "https://images1.vinted.net/t/04_0137b_knvDyA3GfxZDDxSHeNgMfit6/310x430/1786972696.webp?s=bcd8651aa936c6b3db0723f1ea52882745dc71f2",
     "published_at": "19/08/2026",
     "is_sold": false,
-    "is_pending": true
+    "is_pending": false
   },
   {
     "id": "9773672453",
