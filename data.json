@@ -50,26 +50,6 @@
     "is_pending": false
   },
   {
-    "id": "9806871709",
-    "title": "adidas",
-    "price": 6.0,
-    "url": "https://www.vinted.fr/items/9806871709",
-    "image_url": "https://images1.vinted.net/t/06_00c1b_S1xxnUXmRB6FKYLh6ra8SUPs/310x430/1787925289.webp?s=0aa455dcf0da8a5d3dcda1b6a8832d177a444ade",
-    "published_at": "28/08/2026",
-    "is_sold": false,
-    "is_pending": false
-  },
-  {
-    "id": "9791084493",
-    "title": "Google",
-    "price": 5.0,
-    "url": "https://www.vinted.fr/items/9791084493",
-    "image_url": "https://images1.vinted.net/t/01_026bd_BnhPLVMWRFz8VvN8kqNJy3e1/310x430/1787780217.webp?s=1be31d2e1564f3674c030043408359607a0ce1b2",
-    "published_at": "26/08/2026",
-    "is_sold": false,
-    "is_pending": false
-  },
-  {
     "id": "9773827005",
     "title": "Champion",
     "price": 4.0,
@@ -207,7 +187,7 @@
     "image_url": "https://images1.vinted.net/t/06_007c1_Tz6btwpv4HMESmq3L84qG5QF/310x430/1787130380.webp?s=51519c05e6db6acb408ddc5a4625f875854ebb21",
     "published_at": "19/08/2026",
     "is_sold": false,
-    "is_pending": true
+    "is_pending": false
   },
   {
     "id": "9688872296",
@@ -216,6 +196,26 @@
     "url": "https://www.vinted.fr/items/9688872296",
     "image_url": "https://images1.vinted.net/t/05_00598_xDKmCPzbRuYmCLvre1BgZSv3/310x430/1786973623.webp?s=eaa29ae7c8827df3776fc75e34c6bc66d53e52bc",
     "published_at": "19/08/2026",
+    "is_sold": false,
+    "is_pending": false
+  },
+  {
+    "id": "9806871709",
+    "title": "adidas",
+    "price": 6.0,
+    "url": "https://www.vinted.fr/items/9806871709",
+    "image_url": "https://images1.vinted.net/t/06_00c1b_S1xxnUXmRB6FKYLh6ra8SUPs/310x430/1787925289.webp?s=0aa455dcf0da8a5d3dcda1b6a8832d177a444ade",
+    "published_at": "28/08/2026",
+    "is_sold": false,
+    "is_pending": true
+  },
+  {
+    "id": "9791084493",
+    "title": "Google",
+    "price": 5.0,
+    "url": "https://www.vinted.fr/items/9791084493",
+    "image_url": "https://images1.vinted.net/t/01_026bd_BnhPLVMWRFz8VvN8kqNJy3e1/310x430/1787780217.webp?s=1be31d2e1564f3674c030043408359607a0ce1b2",
+    "published_at": "26/08/2026",
     "is_sold": false,
     "is_pending": true
   },
