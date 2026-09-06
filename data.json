@@ -200,16 +200,6 @@
     "is_pending": false
   },
   {
-    "id": "9806994368",
-    "title": "New Era",
-    "price": 6.0,
-    "url": "https://www.vinted.fr/items/9806994368",
-    "image_url": "https://images1.vinted.net/t/06_01ca7_6TheyiEFdMEReLj36ySyisrU/310x430/1787925893.webp?s=0ff140aac150ee5a4d241dd2a98fd6d7263c444b",
-    "published_at": "28/08/2026",
-    "is_sold": false,
-    "is_pending": true
-  },
-  {
     "id": "9688789337",
     "title": "kreemo",
     "price": 6.0,
@@ -217,7 +207,7 @@
     "image_url": "https://images1.vinted.net/t/06_01acd_cJvtpht9E87VjRAgbLweDWcg/310x430/1786973209.webp?s=b9cfae51c17d8ac16646d4c399a75024085580d0",
     "published_at": "19/08/2026",
     "is_sold": false,
-    "is_pending": true
+    "is_pending": false
   },
   {
     "id": "9688687963",
@@ -226,6 +216,16 @@
     "url": "https://www.vinted.fr/items/9688687963",
     "image_url": "https://images1.vinted.net/t/04_0137b_knvDyA3GfxZDDxSHeNgMfit6/310x430/1786972696.webp?s=bcd8651aa936c6b3db0723f1ea52882745dc71f2",
     "published_at": "19/08/2026",
+    "is_sold": false,
+    "is_pending": false
+  },
+  {
+    "id": "9806994368",
+    "title": "New Era",
+    "price": 6.0,
+    "url": "https://www.vinted.fr/items/9806994368",
+    "image_url": "https://images1.vinted.net/t/06_01ca7_6TheyiEFdMEReLj36ySyisrU/310x430/1787925893.webp?s=0ff140aac150ee5a4d241dd2a98fd6d7263c444b",
+    "published_at": "28/08/2026",
     "is_sold": false,
     "is_pending": true
   },
