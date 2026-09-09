@@ -60,16 +60,6 @@
     "is_pending": false
   },
   {
-    "id": "9773800109",
-    "title": "Geographical Norway",
-    "price": 6.0,
-    "url": "https://www.vinted.fr/items/9773800109",
-    "image_url": "https://images1.vinted.net/t/05_00d4c_8QMPtKRkVjy861fJTFRt6x6L/310x430/1787660589.webp?s=a0b9b66ef54b1fe26f8578114832fef67b3720f1",
-    "published_at": "25/08/2026",
-    "is_sold": false,
-    "is_pending": false
-  },
-  {
     "id": "9773759490",
     "title": "Nike",
     "price": 4.0,
@@ -206,6 +196,16 @@
     "url": "https://www.vinted.fr/items/9688789337",
     "image_url": "https://images1.vinted.net/t/06_01acd_cJvtpht9E87VjRAgbLweDWcg/310x430/1786973209.webp?s=b9cfae51c17d8ac16646d4c399a75024085580d0",
     "published_at": "19/08/2026",
+    "is_sold": false,
+    "is_pending": false
+  },
+  {
+    "id": "9773800109",
+    "title": "Geographical Norway",
+    "price": 6.0,
+    "url": "https://www.vinted.fr/items/9773800109",
+    "image_url": "https://images1.vinted.net/t/05_00d4c_8QMPtKRkVjy861fJTFRt6x6L/310x430/1787660589.webp?s=a0b9b66ef54b1fe26f8578114832fef67b3720f1",
+    "published_at": "25/08/2026",
     "is_sold": false,
     "is_pending": true
   },
