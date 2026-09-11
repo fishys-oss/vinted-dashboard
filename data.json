@@ -50,16 +50,6 @@
     "is_pending": false
   },
   {
-    "id": "9773827005",
-    "title": "Champion",
-    "price": 4.0,
-    "url": "https://www.vinted.fr/items/9773827005",
-    "image_url": "https://images1.vinted.net/t/03_02416_x197Grys1EG3ck8fGJk7zYUT/310x430/1787660724.webp?s=b801964d04daec79c66d671b14c809996e65cb8c",
-    "published_at": "25/08/2026",
-    "is_sold": false,
-    "is_pending": false
-  },
-  {
     "id": "9773759490",
     "title": "Nike",
     "price": 4.0,
@@ -206,6 +196,16 @@
     "url": "https://www.vinted.fr/items/9688687963",
     "image_url": "https://images1.vinted.net/t/04_0137b_knvDyA3GfxZDDxSHeNgMfit6/310x430/1786972696.webp?s=bcd8651aa936c6b3db0723f1ea52882745dc71f2",
     "published_at": "19/08/2026",
+    "is_sold": false,
+    "is_pending": false
+  },
+  {
+    "id": "9773827005",
+    "title": "Champion",
+    "price": 4.0,
+    "url": "https://www.vinted.fr/items/9773827005",
+    "image_url": "https://images1.vinted.net/t/03_02416_x197Grys1EG3ck8fGJk7zYUT/310x430/1787660724.webp?s=b801964d04daec79c66d671b14c809996e65cb8c",
+    "published_at": "25/08/2026",
     "is_sold": false,
     "is_pending": true
   },
