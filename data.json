@@ -60,16 +60,6 @@
     "is_pending": false
   },
   {
-    "id": "9773759490",
-    "title": "Nike",
-    "price": 4.0,
-    "url": "https://www.vinted.fr/items/9773759490",
-    "image_url": "https://images1.vinted.net/t/05_000e0_4aGNyqVrjnzRbMQeXP9UxHKD/310x430/1787660386.webp?s=839e70e07bdb1e03d2edf32df1bdf14cff1b2f61",
-    "published_at": "25/08/2026",
-    "is_sold": false,
-    "is_pending": false
-  },
-  {
     "id": "9773738331",
     "title": "Puma",
     "price": 3.0,
@@ -208,6 +198,16 @@
     "published_at": "19/08/2026",
     "is_sold": false,
     "is_pending": false
+  },
+  {
+    "id": "9773759490",
+    "title": "Nike",
+    "price": 4.0,
+    "url": "https://www.vinted.fr/items/9773759490",
+    "image_url": "https://images1.vinted.net/t/05_000e0_4aGNyqVrjnzRbMQeXP9UxHKD/310x430/1787660386.webp?s=839e70e07bdb1e03d2edf32df1bdf14cff1b2f61",
+    "published_at": "25/08/2026",
+    "is_sold": false,
+    "is_pending": true
   },
   {
     "id": "9773827005",
